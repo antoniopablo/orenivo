@@ -31,15 +31,15 @@ const SIDEBAR_SELECTORS = [
 ];
 
 const CONVERSATION_ITEM_SELECTORS = [
-  "a[href^='/chat/']",
+  "a[href^='/c/']",
+  "a[href*='/c/']",
   "[class*='conversation'] a",
   "[class*='Conversation'] a",
+  "[class*='history'] a",
+  "[class*='History'] a",
   "[class*='chat-item'] a",
   "[class*='chatItem'] a",
-  "[class*='history-item'] a",
-  "[class*='historyItem'] a",
-  "li a[href*='/chat/']",
-  "a[href*='/chat/']",
+  "li a",
 ];
 
 export class GrokAdapter implements PlatformAdapter {
@@ -64,7 +64,8 @@ export class GrokAdapter implements PlatformAdapter {
         ? new URL(href).pathname
         : href;
 
-      const match = path.match(/\/chat\/([^/?#]+)/);
+      // Matches /c/<id> (current) or /chat/<id> (fallback)
+      const match = path.match(/\/(?:c|chat)\/([^/?#]+)/);
       if (!match) continue;
 
       const id = match[1].trim();
@@ -84,7 +85,7 @@ export class GrokAdapter implements PlatformAdapter {
         id,
         title,
         platform: "grok",
-        url: `https://grok.com/chat/${id}`,
+        url: `https://grok.com/c/${id}`,
         lastAccessed: Date.now(),
         pinned: false,
         folderId: null,

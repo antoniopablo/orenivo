@@ -44,8 +44,8 @@ export const PLATFORMS: Record<Platform, PlatformInfo> = {
   grok: {
     id: "grok",
     name: "Grok",
-    color: "#000000",
-    icon: "✕",
+    color: "#1a1a1a",
+    icon: "G",
     hostPatterns: ["grok.com"],
   },
 };
