@@ -11,7 +11,7 @@ export type Plan = "free" | "pro";
 export const FREE_LIMITS = {
   folders: 5,
   prompts: 5,
-  platforms: ["chatgpt", "claude"] as Platform[],
+  platforms: ["chatgpt", "claude", "gemini", "deepseek"] as Platform[],
 } as const;
 
 // ── Limit checks ──

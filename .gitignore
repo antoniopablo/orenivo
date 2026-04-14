@@ -8,3 +8,4 @@ dist/
 .env.local
 reports/prospecting/
 scripts/prospecting/config.json
+scripts/prospecting/
