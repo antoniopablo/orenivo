@@ -3,10 +3,10 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    name: "Orenivo — AI Chat Organizer: Folders for ChatGPT, Claude, Gemini",
+    name: "Orenivo: Multi-AI Chat Organizer — ChatGPT, Claude, Gemini & Grok",
     description:
-      "Organize ChatGPT, Claude, Gemini & DeepSeek chats with folders, search & prompt templates — all in one side panel.",
-    version: "0.1.0",
+      "Free folders, search & prompts for ChatGPT, Claude, Gemini, Grok and DeepSeek — all in one side panel. No paywall to try it.",
+    version: "0.1.3",
     permissions: ["storage", "sidePanel", "activeTab"],
     host_permissions: [
       "https://chat.openai.com/*",
@@ -14,6 +14,7 @@ export default defineConfig({
       "https://claude.ai/*",
       "https://gemini.google.com/*",
       "https://chat.deepseek.com/*",
+      "https://grok.com/*",
     ],
     side_panel: {
       default_path: "sidepanel.html",

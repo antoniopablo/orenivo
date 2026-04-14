@@ -2,7 +2,7 @@
 // CHATORIO — Core Types
 // ═══════════════════════════════════════════════════════════
 
-export type Platform = "chatgpt" | "claude" | "gemini" | "deepseek";
+export type Platform = "chatgpt" | "claude" | "gemini" | "deepseek" | "grok";
 
 export interface PlatformInfo {
   id: Platform;
@@ -40,6 +40,13 @@ export const PLATFORMS: Record<Platform, PlatformInfo> = {
     color: "#6366f1",
     icon: "◆",
     hostPatterns: ["chat.deepseek.com"],
+  },
+  grok: {
+    id: "grok",
+    name: "Grok",
+    color: "#000000",
+    icon: "✕",
+    hostPatterns: ["grok.com"],
   },
 };
 

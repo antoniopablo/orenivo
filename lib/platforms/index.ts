@@ -8,6 +8,7 @@ import { ChatGPTAdapter } from "./chatgpt";
 import { ClaudeAdapter } from "./claude";
 import { GeminiAdapter } from "./gemini";
 import { DeepSeekAdapter } from "./deepseek";
+import { GrokAdapter } from "./grok";
 
 // Register all adapters here. To add a new platform, create
 // an adapter in lib/platforms/ and add it to this array.
@@ -16,6 +17,7 @@ const adapters: PlatformAdapter[] = [
   new ClaudeAdapter(),
   new GeminiAdapter(),
   new DeepSeekAdapter(),
+  new GrokAdapter(),
 ];
 
 /**

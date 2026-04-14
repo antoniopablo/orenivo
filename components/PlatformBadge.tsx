@@ -5,6 +5,7 @@ const BADGE_BG: Record<Platform, string> = {
   claude:   "#d97706",
   gemini:   "#4285f4",
   deepseek: "#4f6ef7",
+  grok:     "#1a1a1a",
 };
 
 export function PlatformBadge({ platform }: { platform: Platform }) {
@@ -74,6 +75,19 @@ function PlatformIcon({ platform }: { platform: Platform }) {
             strokeWidth="1.4"
             fill="none"
             strokeLinejoin="round"
+          />
+        </svg>
+      );
+
+    case "grok":
+      // Grok (xAI): the X logo
+      return (
+        <svg {...svgProps}>
+          <path
+            d="M2.5 2.5 L11.5 11.5 M11.5 2.5 L2.5 11.5"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
         </svg>
       );
