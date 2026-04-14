@@ -1,0 +1,39 @@
+{
+  "data": {
+    "children": [
+      {
+        "data": {
+          "id": "abc123",
+          "subreddit": "ClaudeAI",
+          "title": "How do you organize your Claude conversations when you have hundreds of them?",
+          "selftext": "Projects help a bit but I still can't find old chat history and I reuse the same prompts all the time.",
+          "permalink": "/r/ClaudeAI/comments/abc123/how_do_you_organize_your_claude_conversations/",
+          "num_comments": 17,
+          "created_utc": 1775510400
+        }
+      },
+      {
+        "data": {
+          "id": "def456",
+          "subreddit": "OpenAI",
+          "title": "Anyone here using both ChatGPT and Claude? Worth it?",
+          "selftext": "I switch between both daily and the fragmented workflow is getting messy.",
+          "permalink": "/r/OpenAI/comments/def456/anyone_here_using_both_chatgpt_and_claude_worth_it/",
+          "num_comments": 24,
+          "created_utc": 1775521200
+        }
+      },
+      {
+        "data": {
+          "id": "ghi789",
+          "subreddit": "GeminiAI",
+          "title": "Why doesn't the Gemini app have folders or projects?",
+          "selftext": "This hurts on mobile and Android more than web for me.",
+          "permalink": "/r/GeminiAI/comments/ghi789/why_doesnt_the_gemini_app_have_folders_or_projects/",
+          "num_comments": 9,
+          "created_utc": 1775524800
+        }
+      }
+    ]
+  }
+}

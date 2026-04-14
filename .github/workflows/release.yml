@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Create zip for Chrome Web Store
+        run: npm run zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Chatorio ${{ github.ref_name }}
+          body: |
+            ## Chatorio ${{ github.ref_name }}
+
+            ### Install
+            1. Download `chatorio-${{ github.ref_name }}.zip` below
+            2. Unzip it
+            3. Open `chrome://extensions` → Enable developer mode
+            4. Click "Load unpacked" → select the unzipped folder
+
+            Or install from the [Chrome Web Store](https://chromewebstore.google.com) once approved.
+          files: .output/*.zip
+          generate_release_notes: true

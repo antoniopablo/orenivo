@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatorio — Organize All Your AI Chats: Folders for ChatGPT, Claude, Gemini & DeepSeek</title>
+    <meta name="description" content="The only Chrome extension that organizes your ChatGPT, Claude, Gemini & DeepSeek conversations with folders, search, and prompt management. Free to start.">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --emerald: #10b981;
+            --emerald-dark: #059669;
+            --bg: #06060a;
+            --surface: #0d0d14;
+            --border: rgba(255,255,255,0.06);
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --glow: rgba(16, 185, 129, 0.08);
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+        /* Nav */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 16px 24px;
+            background: rgba(6,6,10,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        nav .inner {
+            max-width: 960px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-text { font-size: 18px; font-weight: 700; color: white; }
+        .logo-text span { color: var(--emerald); }
+        .nav-cta {
+            padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+            color: white; text-decoration: none; border: none; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .nav-cta:hover { opacity: 0.9; }
+
+        /* Hero */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 100px;
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.15);
+            font-size: 12px; color: var(--emerald); font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .badge-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--emerald);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        h1 {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            color: white;
+        }
+        h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--emerald), #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            font-size: 17px;
+            color: var(--muted);
+            max-width: 520px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .hero-cta {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: 600;
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+            color: white; text-decoration: none; border: none; cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 30px rgba(16,185,129,0.2);
+        }
+        .hero-cta:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(16,185,129,0.3); }
+        .hero-cta svg { width: 18px; height: 18px; }
+        .hero-sub {
+            margin-top: 14px;
+            font-size: 12px; color: var(--muted);
+        }
+
+        /* Platforms */
+        .platforms {
+            display: flex; justify-content: center; gap: 32px;
+            margin-top: 48px; flex-wrap: wrap;
+        }
+        .platform {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--muted);
+        }
+        .platform-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+
+        /* Features */
+        .features {
+            padding: 80px 0;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .feature {
+            padding: 28px 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            transition: all 0.3s;
+        }
+        .feature:hover {
+            border-color: rgba(16,185,129,0.2);
+            box-shadow: 0 0 30px var(--glow);
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+        .feature h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .feature p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Comparison */
+        .comparison {
+            padding: 60px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: white;
+        }
+        .section-sub {
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 48px;
+        }
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .comp-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--muted);
+            font-weight: 500;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+        .comp-table th:last-child { color: var(--emerald); }
+        .comp-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+        }
+        .comp-table td:first-child { color: var(--text); font-weight: 500; }
+        .comp-table td:last-child {
+            color: var(--emerald);
+            font-weight: 500;
+        }
+        .check { color: var(--emerald); }
+        .cross { color: #ef4444; opacity: 0.5; }
+
+        /* Email capture */
+        .email-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .email-box {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 40px 32px;
+            border-radius: 16px;
+            border: 1px solid rgba(16,185,129,0.15);
+            background: var(--surface);
+            position: relative;
+            overflow: hidden;
+        }
+        .email-box::before {
+            content: '';
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 400px; height: 200px;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+        }
+        .email-box h2 {
+            font-size: 22px; font-weight: 700; color: white;
+            margin-bottom: 8px; position: relative;
+        }
+        .email-box p {
+            font-size: 13px; color: var(--muted);
+            margin-bottom: 24px; position: relative;
+        }
+        .email-form {
+            display: flex; gap: 8px; position: relative;
+        }
+        .email-input {
+            flex: 1; padding: 12px 16px; border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white; font-size: 14px; font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .email-input:focus { border-color: rgba(16,185,129,0.4); }
+        .email-input::placeholder { color: #4a5568; }
+        .email-btn {
+            padding: 12px 24px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+            color: white; font-size: 14px; font-weight: 600;
+            border: none; cursor: pointer; white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+        .email-btn:hover { opacity: 0.9; }
+        .email-note {
+            margin-top: 12px; font-size: 11px; color: var(--muted);
+            position: relative;
+        }
+
+        /* Footer */
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        footer p { font-size: 12px; color: var(--muted); }
+        footer a { color: var(--emerald); text-decoration: none; }
+
+        @media (max-width: 640px) {
+            .email-form { flex-direction: column; }
+            .platforms { gap: 16px; }
+            .comp-table { font-size: 11px; }
+            .comp-table th, .comp-table td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="inner">
+        <a href="#" class="logo">
+            <div class="logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+                    <rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/>
+                    <rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/>
+                    <rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/>
+                </svg>
+            </div>
+            <div class="logo-text"><span>Chat</span>ario</div>
+        </a>
+        <a href="#install" class="nav-cta">Instalar gratis</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Compatible con ChatGPT, Claude, Gemini & DeepSeek
+        </div>
+        <h1>Tus conversaciones de IA.<br><em>Por fin organizadas.</em></h1>
+        <p class="subtitle">
+            Carpetas, búsqueda y gestión de prompts para ChatGPT, Claude, Gemini y DeepSeek. 
+            Todo desde un solo panel lateral en tu navegador.
+        </p>
+        <a href="#install" class="hero-cta" id="install">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            Añadir a Chrome — Gratis
+        </a>
+        <p class="hero-sub">Gratis para siempre · No requiere tarjeta · 4 plataformas</p>
+
+        <div class="platforms">
+            <div class="platform">
+                <span class="platform-dot" style="background: #10a37f;"></span>
+                ChatGPT
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #d97706;"></span>
+                Claude
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #4285f4;"></span>
+                Gemini
+            </div>
+            <div class="platform">
+                <span class="platform-dot" style="background: #6366f1;"></span>
+                DeepSeek
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">📁</div>
+                <h3>Carpetas y subcarpetas</h3>
+                <p>Organiza tus conversaciones por proyecto, cliente o tema. Arrastra y suelta para mover chats entre carpetas con colores personalizados.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <h3>Búsqueda instantánea</h3>
+                <p>Encuentra cualquier conversación en segundos. Busca por título, contenido o plataforma. Nunca más pierdas ese prompt perfecto.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>Prompt Manager</h3>
+                <p>Guarda, categoriza y reutiliza tus mejores prompts con un clic. Usa variables dinámicas para adaptar templates al instante.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🌐</div>
+                <h3>4 plataformas, 1 panel</h3>
+                <p>ChatGPT + Claude + Gemini + DeepSeek unificados. La única extensión que organiza todas tus herramientas de IA a la vez.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📌</div>
+                <h3>Pins y favoritos</h3>
+                <p>Fija las conversaciones que más usas arriba del todo. Acceso instantáneo a tus chats más importantes sin buscar.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">☁️</div>
+                <h3>Sync entre dispositivos</h3>
+                <p>Tus carpetas y prompts sincronizados en todos tus navegadores. Empieza en el trabajo, continúa en casa. Todo en su sitio.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="comparison">
+    <div class="container">
+        <h2 class="section-title">¿Por qué Chatorio?</h2>
+        <p class="section-sub">La única extensión que cubre las 4 plataformas principales de IA</p>
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th>Funcionalidad</th>
+                    <th>ChatGPT nativo</th>
+                    <th>Easy Folders</th>
+                    <th>Chatorio ✦</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Carpetas</td>
+                    <td><span class="cross">✗</span> Solo "Projects"</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span> + subcarpetas</td>
+                </tr>
+                <tr>
+                    <td>ChatGPT</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Claude</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Gemini</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>DeepSeek</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Prompt Manager</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span> Básico</td>
+                    <td><span class="check">✓</span> Con variables</td>
+                </tr>
+                <tr>
+                    <td>Búsqueda full-text</td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="check">✓</span></td>
+                </tr>
+                <tr>
+                    <td>Free tier generoso</td>
+                    <td>N/A</td>
+                    <td>5 carpetas</td>
+                    <td>5 carpetas + 14d trial Pro</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="email-section">
+    <div class="container">
+        <div class="email-box">
+            <h2>Acceso anticipado</h2>
+            <p>Sé de los primeros en probar Chatorio. Los primeros 100 usuarios consiguen Pro gratis durante 3 meses.</p>
+            <form class="email-form" onsubmit="event.preventDefault(); this.innerHTML='<p style=\'color:#10b981;font-size:14px;padding:12px\'>🎉 ¡Apuntado! Te avisamos cuando esté listo.</p>';">
+                <input type="email" class="email-input" placeholder="tu@email.com" required>
+                <button type="submit" class="email-btn">Quiero acceso</button>
+            </form>
+            <p class="email-note">Sin spam. Solo te avisamos del lanzamiento y novedades importantes.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>Hecho con ☕ desde España · <a href="#">Política de privacidad</a> · © 2026 Chatorio</p>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Orenivo — Screenshot 4: Search</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 800px; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #06060a; display: flex; align-items: center;
+    justify-content: center; gap: 64px; position: relative;
+  }
+  body::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(59,130,246,0.06) 0%, transparent 55%);
+    pointer-events:none;
+  }
+
+  .panel { width: 420px; background: #0d0d14; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 40px rgba(16,185,129,0.04); overflow: hidden; position: relative; z-index: 1; }
+  .ph { padding: 13px 16px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .li { width: 26px; height: 26px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .li svg { width: 13px; height: 13px; }
+  .ln { font-size: 15px; font-weight: 700; color: #fff; }
+
+  .search-wrap { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .searchbar { background: rgba(255,255,255,0.06); border: 1px solid rgba(16,185,129,0.35); border-radius: 10px; padding: 9px 13px; display: flex; align-items: center; gap: 9px; box-shadow: 0 0 24px rgba(16,185,129,0.1); margin-bottom: 10px; }
+  .s-icon { color: #10b981; font-size: 14px; }
+  .s-text { flex: 1; font-size: 14px; color: #fff; }
+  .s-cursor { width: 2px; height: 16px; background: #10b981; animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .chips { display: flex; gap: 5px; }
+  .chip { padding: 4px 10px; border-radius: 7px; font-size: 11px; font-weight: 500; }
+  .chip.on { background: rgba(255,255,255,0.1); color: #fff; }
+  .chip.off { color: #4b5563; }
+
+  .results-label { padding: 10px 14px 5px; font-size: 10px; color: #374151; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+
+  .rrow { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .rrow:last-child { border-bottom: none; }
+  .rrow.hl { background: rgba(16,185,129,0.05); }
+  .pd { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff; }
+  .ri { flex: 1; min-width: 0; }
+  .rt { font-size: 13px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .rt .hl-word { color: #10b981; font-weight: 600; }
+  .rm { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #374151; }
+  .fp { width: 7px; height: 7px; border-radius: 2px; }
+  .rag { font-size: 10px; color: #374151; flex-shrink: 0; }
+
+  .copy { width: 360px; position: relative; z-index: 1; }
+  .tag { display: inline-flex; align-items: center; gap: 7px; padding: 5px 14px; border-radius: 999px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.18); font-size: 12px; color: #34d399; font-weight: 500; margin-bottom: 22px; }
+  .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+  h2 { font-size: 46px; font-weight: 800; color: #fff; letter-spacing: -0.04em; line-height: 1.06; margin-bottom: 18px; }
+  h2 em { font-style: normal; background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .desc { font-size: 16px; color: #4b5563; line-height: 1.7; margin-bottom: 28px; }
+  .kbd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+  .kbd { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 7px; padding: 5px 12px; font-size: 14px; color: #e2e8f0; font-weight: 600; font-family: monospace; }
+  .or { font-size: 13px; color: #374151; }
+  .feats { display: flex; flex-direction: column; gap: 14px; }
+  .feat { display: flex; align-items: flex-start; gap: 14px; }
+  .fi { width: 34px; height: 34px; border-radius: 9px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .ft { font-size: 13px; color: #6b7280; line-height: 1.55; padding-top: 7px; }
+  .ft strong { color: #e2e8f0; display: block; margin-bottom: 2px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <div class="ph">
+    <div class="logo">
+      <div class="li"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/><rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/><rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/><rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/></svg></div>
+      <span class="ln">Orenivo</span>
+    </div>
+    <span style="font-size:15px;color:#374151">⚙</span>
+  </div>
+
+  <div class="search-wrap">
+    <div class="searchbar">
+      <span class="s-icon">🔍</span>
+      <span class="s-text">arch<span style="color:#10b981;font-weight:600">itec</span></span>
+      <span class="s-cursor"></span>
+    </div>
+    <div class="chips">
+      <span class="chip on">All</span>
+      <span class="chip off" style="color:#10a37f">⬡ ChatGPT</span>
+      <span class="chip off" style="color:#d97706">◈ Claude</span>
+      <span class="chip off" style="color:#4285f4">✦ Gemini</span>
+      <span class="chip off" style="color:#6366f1">◆ DeepSeek</span>
+    </div>
+  </div>
+
+  <div class="results-label">4 results for "architec"</div>
+
+  <div class="rrow hl">
+    <div class="pd" style="background:#d97706">◈</div>
+    <div class="ri">
+      <div class="rt"><span class="hl-word">Architect</span>ure review: microservices</div>
+      <div class="rm"><span class="fp" style="background:#10b981"></span>Work projects</div>
+    </div>
+    <span class="rag">2h ago</span>
+  </div>
+  <div class="rrow">
+    <div class="pd" style="background:#10a37f">⬡</div>
+    <div class="ri">
+      <div class="rt">Cloud <span class="hl-word">architect</span>ure patterns AWS</div>
+      <div class="rm"><span class="fp" style="background:#3b82f6"></span>Work projects / Frontend</div>
+    </div>
+    <span class="rag">1d ago</span>
+  </div>
+  <div class="rrow">
+    <div class="pd" style="background:#4285f4">✦</div>
+    <div class="ri">
+      <div class="rt">System <span class="hl-word">architect</span>ure for SaaS</div>
+      <div class="rm"><span class="fp" style="background:#8b5cf6"></span>Research</div>
+    </div>
+    <span class="rag">3d ago</span>
+  </div>
+  <div class="rrow">
+    <div class="pd" style="background:#6366f1">◆</div>
+    <div class="ri">
+      <div class="rt">Data <span class="hl-word">architect</span>ure best practices</div>
+      <div class="rm"><span class="fp" style="background:#f59e0b"></span>Personal</div>
+    </div>
+    <span class="rag">5d ago</span>
+  </div>
+</div>
+
+<div class="copy">
+  <div class="tag"><span class="tag-dot"></span> Instant search</div>
+  <h2>Find any chat<br>in <em>seconds.</em></h2>
+  <p class="desc">Search across all 4 platforms at once. Results appear as you type — no need to remember which AI tool you used.</p>
+  <div class="kbd-row">
+    <span class="kbd">⌘K</span>
+    <span class="or">or</span>
+    <span class="kbd">Ctrl+K</span>
+    <span style="font-size:13px;color:#4b5563">to focus from anywhere</span>
+  </div>
+  <div class="feats">
+    <div class="feat">
+      <div class="fi">⚡</div>
+      <div class="ft"><strong>Search as you type</strong>Instant results from all platforms and all folders</div>
+    </div>
+    <div class="feat">
+      <div class="fi">🎯</div>
+      <div class="ft"><strong>Filter by platform</strong>Narrow down to ChatGPT, Claude, Gemini or DeepSeek</div>
+    </div>
+    <div class="feat">
+      <div class="fi">📁</div>
+      <div class="ft"><strong>See folder context</strong>Every result shows which folder the conversation lives in</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orenivo — One panel for all your AI conversations</title>
+  <meta name="description" content="Orenivo organizes your ChatGPT, Claude, Gemini and DeepSeek conversations into a single Chrome side panel with folders, instant search, and prompt templates. Free to start." />
+  <meta property="og:title" content="Orenivo — One panel for all your AI conversations" />
+  <meta property="og:description" content="Folders, search, and prompt templates for ChatGPT, Claude, Gemini & DeepSeek. Free Chrome extension." />
+  <meta property="og:image" content="https://orenivo.ai/og.png" />
+  <meta property="og:url" content="https://orenivo.ai" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@orenivoapp" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #06060a;
+      --surface: #0d0d14;
+      --surface-2: #12121e;
+      --border: rgba(255,255,255,0.07);
+      --border-hover: rgba(16,185,129,0.25);
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --muted-2: #94a3b8;
+      --accent: #10b981;
+      --accent-dark: #059669;
+      --accent-dim: rgba(16,185,129,0.08);
+      --accent-glow: rgba(16,185,129,0.15);
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle noise texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      padding: 0 24px;
+      background: rgba(6,6,10,0.88);
+      backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1000px; margin: 0 auto;
+      display: flex; align-items: center; height: 60px;
+      gap: 32px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .logo-mark {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-mark svg { width: 15px; height: 15px; }
+    .logo-name { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+    .nav-links {
+      display: flex; align-items: center; gap: 24px;
+      margin-left: auto;
+    }
+    .nav-links a {
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 7px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white; text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .hero {
+      padding: 148px 0 100px;
+      text-align: center;
+      position: relative;
+    }
+    .hero-glow {
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse at top, rgba(16,185,129,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 14px; border-radius: 100px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(16,185,129,0.18);
+      font-size: 12px; color: var(--accent); font-weight: 500;
+      letter-spacing: 0.01em;
+      margin-bottom: 28px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    h1 {
+      font-size: clamp(38px, 6.5vw, 62px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      color: #fff;
+      margin-bottom: 22px;
+    }
+    h1 .accent {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted-2);
+      max-width: 540px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+      font-weight: 400;
+    }
+    .cta-group {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 13px 28px; border-radius: 12px; font-size: 15px; font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white; text-decoration: none;
+      box-shadow: 0 0 32px rgba(16,185,129,0.22);
+      transition: all 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 44px rgba(16,185,129,0.32); }
+    .btn-primary svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 22px; border-radius: 12px; font-size: 14px; font-weight: 500;
+      border: 1px solid var(--border);
+      color: var(--muted-2); text-decoration: none;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.12); color: var(--text); }
+    .hero-note {
+      margin-top: 14px;
+      font-size: 12px; color: var(--muted);
+    }
+    .hero-note span { margin: 0 6px; }
+
+    /* Platform bar */
+    .platforms {
+      display: flex; align-items: center; justify-content: center;
+      gap: 28px; margin-top: 56px;
+      flex-wrap: wrap;
+    }
+    .platform {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; color: var(--muted);
+      font-weight: 500;
+    }
+    .platform-icon {
+      width: 22px; height: 22px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+    .sep { width: 1px; height: 16px; background: var(--border); }
+
+    /* ── MOCK UI PREVIEW ─────────────────────────────────────── */
+    .preview-wrap {
+      padding: 0 0 80px;
+      position: relative;
+    }
+    .preview-fade {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      pointer-events: none; z-index: 2;
+    }
+    .preview-box {
+      max-width: 800px; margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      overflow: hidden;
+      box-shadow: 0 0 80px rgba(0,0,0,0.6), 0 0 40px rgba(16,185,129,0.06);
+    }
+    .preview-top {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .win-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .preview-content {
+      display: grid; grid-template-columns: 200px 1fr;
+      min-height: 320px;
+    }
+    .preview-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 12px;
+    }
+    .preview-search {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11px; color: var(--muted);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .preview-folder {
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex; align-items: center; gap: 6px;
+      cursor: default;
+      margin-bottom: 2px;
+    }
+    .preview-folder.active { background: var(--accent-dim); color: var(--accent); }
+    .preview-folder:not(.active) { color: var(--muted); }
+    .folder-dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
+    .preview-conv {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+    }
+    .preview-conv:last-child { border-bottom: none; }
+    .conv-title { font-size: 12px; color: var(--text); font-weight: 500; margin-bottom: 3px; }
+    .conv-meta { font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .conv-platform {
+      width: 14px; height: 14px; border-radius: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 9px;
+    }
+
+    /* ── SOCIAL PROOF ────────────────────────────────────────── */
+    .social-proof {
+      padding: 20px 0 80px;
+    }
+    .stat-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 48px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.04em; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── FEATURES ────────────────────────────────────────────── */
+    .section {
+      padding: 80px 0;
+    }
+    .section-label {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 11px; font-weight: 600; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #fff;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+    .section-desc {
+      text-align: center;
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 52px;
+      line-height: 1.65;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links .hide-mobile { display: none; }
+      .preview-content { grid-template-columns: 1fr; }
+      .preview-sidebar { display: none; }
+      .stat-row { gap: 28px; }
+    }
+    @media (max-width: 540px) {
+      .comp-grid { grid-template-columns: 1fr; }
+    }
+    .feat-card {
+      padding: 26px 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .feat-card:hover {
+      border-color: var(--border-hover);
+      box-shadow: 0 0 28px var(--accent-dim);
+    }
+    .feat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(16,185,129,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feat-card h3 {
+      font-size: 14px; font-weight: 600; color: #fff;
+      margin-bottom: 7px; letter-spacing: -0.01em;
+    }
+    .feat-card p {
+      font-size: 13px; color: var(--muted); line-height: 1.6;
+    }
+
+    /* ── HOW IT WORKS ────────────────────────────────────────── */
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    @media (max-width: 640px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: calc(16.67% + 14px); right: calc(16.67% + 14px);
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), var(--border), transparent);
+    }
+    .step { padding: 0 20px; text-align: center; }
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--accent);
+      margin: 0 auto 16px;
+      position: relative; z-index: 1;
+    }
+    .step h3 { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── PRICING ─────────────────────────────────────────────── */
+    .pricing-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; max-width: 680px; margin: 0 auto;
+    }
+    @media (max-width: 560px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+    .plan {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 28px 24px;
+      background: var(--surface);
+    }
+    .plan.pro {
+      border-color: rgba(16,185,129,0.3);
+      background: linear-gradient(135deg, rgba(16,185,129,0.05) 0%, var(--surface) 100%);
+      position: relative; overflow: hidden;
+    }
+    .plan.pro::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%);
+    }
+    .plan-badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 100px;
+      background: var(--accent); color: white;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+    .plan-name { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .plan-price {
+      margin: 12px 0 20px;
+    }
+    .plan-price .amount {
+      font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    }
+    .plan-price .period { font-size: 14px; color: var(--muted); }
+    .plan-price .free-label {
+      font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.04em;
+    }
+    .plan-features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: 13px; color: var(--muted-2);
+      padding: 5px 0;
+    }
+    .plan-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .plan-features li.muted { color: var(--muted); }
+    .plan-features li.muted::before { content: '–'; color: var(--muted); }
+    .plan-btn {
+      display: block; width: 100%;
+      padding: 11px 16px; border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      text-align: center; text-decoration: none;
+      transition: all 0.2s; cursor: pointer; border: none;
+    }
+    .plan-btn.outlined {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: transparent;
+    }
+    .plan-btn.outlined:hover { border-color: rgba(255,255,255,0.14); }
+    .plan-btn.filled {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      box-shadow: 0 0 20px rgba(16,185,129,0.18);
+    }
+    .plan-btn.filled:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ── COMPARISON TABLE ────────────────────────────────────── */
+    .comp-wrap {
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    .comp-table {
+      width: 100%; min-width: 560px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .comp-table th {
+      text-align: left;
+      padding: 10px 16px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    .comp-table th:last-child { color: var(--accent); }
+    .comp-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      vertical-align: middle;
+    }
+    .comp-table td:first-child { color: var(--text); font-weight: 500; }
+    .comp-table td:last-child { color: var(--accent); font-weight: 500; }
+    .comp-table tr:last-child td { border-bottom: none; }
+    .yes { color: var(--accent) !important; }
+    .no { color: var(--red) !important; opacity: 0.5; }
+
+    /* ── TESTIMONIALS ────────────────────────────────────────── */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 768px) {
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .steps { display: flex; flex-direction: column; gap: 28px; }
+      .steps::before { display: none; }
+    }
+    .testimonial {
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .testimonial-text {
+      font-size: 13px; color: var(--muted-2);
+      line-height: 1.65; margin-bottom: 16px;
+      font-style: italic;
+    }
+    .testimonial-text::before { content: '"'; }
+    .testimonial-text::after { content: '"'; }
+    .testimonial-author {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .author-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #374151, #1f2937);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      flex-shrink: 0;
+    }
+    .author-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .author-role { font-size: 11px; color: var(--muted); }
+    .stars { color: #fbbf24; font-size: 12px; margin-bottom: 10px; }
+
+    /* ── FAQ ─────────────────────────────────────────────────── */
+    .faq-list { max-width: 680px; margin: 0 auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q {
+      font-size: 14px; font-weight: 600; color: #fff;
+      margin-bottom: 10px;
+    }
+    .faq-a {
+      font-size: 13px; color: var(--muted); line-height: 1.65;
+    }
+    .faq-a a { color: var(--accent); text-decoration: none; }
+    .faq-a a:hover { text-decoration: underline; }
+
+    /* ── CTA SECTION ─────────────────────────────────────────── */
+    .cta-section {
+      padding: 80px 0 100px;
+      text-align: center;
+    }
+    .cta-box {
+      max-width: 600px; margin: 0 auto;
+      border-radius: 20px;
+      border: 1px solid rgba(16,185,129,0.2);
+      background: linear-gradient(135deg, rgba(16,185,129,0.05) 0%, var(--surface) 100%);
+      padding: 56px 40px;
+      position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 200px;
+      background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%);
+    }
+    .cta-box h2 {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 800; color: #fff;
+      letter-spacing: -0.035em;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .cta-box p {
+      font-size: 15px; color: var(--muted-2);
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      max-width: 1000px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-left { display: flex; align-items: center; gap: 20px; }
+    .footer-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .footer-logo-mark {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .footer-logo-mark svg { width: 11px; height: 11px; }
+    .footer-logo-name { font-size: 14px; font-weight: 700; color: #fff; }
+    .footer-links { display: flex; align-items: center; gap: 16px; }
+    .footer-links a { font-size: 12px; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-right { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+          <rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/>
+          <rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="logo-name">Orenivo</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="hide-mobile">Features</a>
+      <a href="#pricing" class="hide-mobile">Pricing</a>
+      <a href="#faq" class="hide-mobile">FAQ</a>
+      <a href="#install" class="nav-cta">Add to Chrome — Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Works with ChatGPT, Claude, Gemini &amp; DeepSeek
+    </div>
+    <h1>One panel for<br><span class="accent">all your AI chats.</span></h1>
+    <p class="hero-sub">
+      Stop losing conversations across four different tabs. Orenivo brings folders,
+      instant search, and prompt templates to every AI platform — in one Chrome side panel.
+    </p>
+    <div class="cta-group">
+      <a href="#install" class="btn-primary" id="install">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        Add to Chrome — Free
+      </a>
+      <a href="#features" class="btn-ghost">See how it works →</a>
+    </div>
+    <p class="hero-note">
+      Free forever · No account required · 4 AI platforms
+    </p>
+
+    <div class="platforms">
+      <div class="platform">
+        <div class="platform-icon" style="background: rgba(16,163,127,0.15);">🟢</div>
+        ChatGPT
+      </div>
+      <div class="sep"></div>
+      <div class="platform">
+        <div class="platform-icon" style="background: rgba(217,119,6,0.15);">🟠</div>
+        Claude
+      </div>
+      <div class="sep"></div>
+      <div class="platform">
+        <div class="platform-icon" style="background: rgba(66,133,244,0.15);">🔵</div>
+        Gemini
+      </div>
+      <div class="sep"></div>
+      <div class="platform">
+        <div class="platform-icon" style="background: rgba(99,102,241,0.15);">🟣</div>
+        DeepSeek
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── UI PREVIEW ────────────────────────────────────────────────── -->
+<div class="preview-wrap">
+  <div class="container">
+    <div class="preview-box">
+      <div class="preview-top">
+        <div class="win-dot" style="background:#ef4444;"></div>
+        <div class="win-dot" style="background:#fbbf24;"></div>
+        <div class="win-dot" style="background:#10b981;"></div>
+      </div>
+      <div class="preview-content">
+        <div class="preview-sidebar">
+          <div class="preview-search">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Search conversations…
+          </div>
+          <div class="preview-folder active">
+            <div class="folder-dot" style="background:#10b981;"></div>
+            Work projects
+          </div>
+          <div class="preview-folder" style="padding-left:20px;">
+            <div class="folder-dot" style="background:#6366f1;"></div>
+            Dev tasks
+          </div>
+          <div class="preview-folder" style="padding-left:20px;">
+            <div class="folder-dot" style="background:#f59e0b;"></div>
+            Research
+          </div>
+          <div class="preview-folder">
+            <div class="folder-dot" style="background:#3b82f6;"></div>
+            Personal
+          </div>
+          <div class="preview-folder">
+            <div class="folder-dot" style="background:#ec4899;"></div>
+            Marketing
+          </div>
+        </div>
+        <div>
+          <div class="preview-conv">
+            <div class="conv-meta" style="margin-bottom:4px;">
+              <div class="conv-platform" style="background:rgba(16,163,127,0.2);color:#10a37f;">G</div>
+              ChatGPT · 2h ago
+            </div>
+            <div class="conv-title">TypeScript generics deep dive — mapped types</div>
+          </div>
+          <div class="preview-conv">
+            <div class="conv-meta" style="margin-bottom:4px;">
+              <div class="conv-platform" style="background:rgba(217,119,6,0.2);color:#d97706;">C</div>
+              Claude · Yesterday
+            </div>
+            <div class="conv-title">Architecture review: microservices vs monolith</div>
+          </div>
+          <div class="preview-conv">
+            <div class="conv-meta" style="margin-bottom:4px;">
+              <div class="conv-platform" style="background:rgba(66,133,244,0.2);color:#4285f4;">G</div>
+              Gemini · 3d ago
+            </div>
+            <div class="conv-title">Market analysis for SaaS pricing models</div>
+          </div>
+          <div class="preview-conv">
+            <div class="conv-meta" style="margin-bottom:4px;">
+              <div class="conv-platform" style="background:rgba(99,102,241,0.2);color:#818cf8;">D</div>
+              DeepSeek · 5d ago
+            </div>
+            <div class="conv-title">Competitive landscape: AI coding assistants</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="preview-fade"></div>
+</div>
+
+<!-- ── SOCIAL PROOF ──────────────────────────────────────────────── -->
+<section class="social-proof">
+  <div class="container">
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">AI platforms supported</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Local by default — your data stays on your device</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Chat content read — only titles</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ──────────────────────────────────────────────────── -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything you need, nothing you don't</h2>
+    <p class="section-desc">Built for people who use multiple AI tools daily and are tired of losing context.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📁</div>
+        <h3>Folders &amp; subfolders</h3>
+        <p>Create nested folders by project, client, or topic. Color-coded, drag-to-reorder, with unlimited nesting.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <h3>Instant search</h3>
+        <p>Find any conversation in milliseconds. Press <kbd style="font-size:11px;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:4px;font-family:monospace;">⌘K</kbd> from any AI tab and search across all platforms at once.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Prompt templates</h3>
+        <p>Save your best prompts with dynamic variables. One click to copy — no more rewriting the same instructions.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌐</div>
+        <h3>All 4 platforms, one panel</h3>
+        <p>ChatGPT, Claude, Gemini, and DeepSeek — organized together. Switch between tools without losing track.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📌</div>
+        <h3>Pins &amp; favorites</h3>
+        <p>Pin the conversations you return to most. Always at the top, always one click away.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">☁️</div>
+        <h3>Cross-device sync <span style="font-size:10px;background:rgba(16,185,129,0.15);color:var(--accent);padding:2px 7px;border-radius:100px;font-weight:600;vertical-align:middle;">PRO</span></h3>
+        <p>Folders and prompts synced across all your browsers and devices. Start on your MacBook, pick up on your desktop.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────────────────────────── -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Up and running in 30 seconds</h2>
+    <p class="section-desc">No setup wizard. No account needed. Open a tab and it just works.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Install the extension</h3>
+        <p>Add Orenivo from the Chrome Web Store. It takes about 10 seconds.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Open any AI platform</h3>
+        <p>Go to ChatGPT, Claude, Gemini, or DeepSeek. The side panel opens automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Create folders, organize</h3>
+        <p>Drag conversations into folders, pin the ones you use daily, save your prompts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VS COMPARISON ─────────────────────────────────────────────── -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-label">Comparison</div>
+    <h2 class="section-title">Why Orenivo?</h2>
+    <p class="section-desc">The only extension that organizes all four major AI platforms at once.</p>
+    <div class="comp-wrap">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>ChatGPT native</th>
+            <th>Other extensions</th>
+            <th>Orenivo ✦</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Folders</td>
+            <td><span class="no">✗</span> Projects only</td>
+            <td><span class="yes">✓</span> Basic</td>
+            <td><span class="yes">✓</span> + subfolders + colors</td>
+          </tr>
+          <tr>
+            <td>ChatGPT</td>
+            <td><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Claude</td>
+            <td><span class="no">✗</span></td>
+            <td>Rarely</td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Gemini</td>
+            <td><span class="no">✗</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>DeepSeek</td>
+            <td><span class="no">✗</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Prompt manager</td>
+            <td><span class="no">✗</span></td>
+            <td>Sometimes</td>
+            <td><span class="yes">✓</span> With variables</td>
+          </tr>
+          <tr>
+            <td>Keyboard shortcut (⌘K)</td>
+            <td><span class="no">✗</span></td>
+            <td><span class="no">✗</span></td>
+            <td><span class="yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Privacy — no chat content read</td>
+            <td>N/A</td>
+            <td>Varies</td>
+            <td><span class="yes">✓</span> Titles only</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ──────────────────────────────────────────────── -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-label">Early users</div>
+    <h2 class="section-title">What people are saying</h2>
+    <p class="section-desc" style="margin-bottom: 36px;">From developers, designers, and writers using 2+ AI tools daily.</p>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">Finally. I use Claude for writing and ChatGPT for code. Having everything in one sidebar has saved me so much context-switching pain.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">M</div>
+          <div>
+            <div class="author-name">Marta P.</div>
+            <div class="author-role">Fullstack developer</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">The prompt templates alone are worth it. I have about 30 prompts I use weekly. Now they're one click away instead of buried in a doc.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">J</div>
+          <div>
+            <div class="author-name">James R.</div>
+            <div class="author-role">Content strategist</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">I had 400+ conversations in ChatGPT and could never find anything. Within 30 minutes I had them organized into folders. Game changer.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">S</div>
+          <div>
+            <div class="author-name">Sofia K.</div>
+            <div class="author-role">Product designer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ───────────────────────────────────────────────────── -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Start free, upgrade when you need more</h2>
+    <p class="section-desc">Core features are free forever. Pro is for power users who want cloud sync.</p>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">
+          <span class="free-label">$0</span>
+          <span class="period"> / forever</span>
+        </div>
+        <ul class="plan-features">
+          <li>All 4 AI platforms</li>
+          <li>Up to 5 folders</li>
+          <li>Unlimited conversations</li>
+          <li>Prompt templates (up to 10)</li>
+          <li>Instant search (⌘K)</li>
+          <li>Pin conversations</li>
+          <li>Local storage only</li>
+          <li class="muted">No cloud sync</li>
+          <li class="muted">No cross-device</li>
+        </ul>
+        <a href="#install" class="plan-btn outlined">Get started free</a>
+      </div>
+      <div class="plan pro">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">
+          <span class="amount">$4</span>
+          <span class="period"> / month</span>
+        </div>
+        <ul class="plan-features">
+          <li>Everything in Free</li>
+          <li>Unlimited folders &amp; subfolders</li>
+          <li>Unlimited prompt templates</li>
+          <li>Cloud sync (all devices)</li>
+          <li>JSON export / import</li>
+          <li>Priority support</li>
+          <li>Early access to new features</li>
+        </ul>
+        <a href="#install" class="plan-btn filled">Start 14-day free trial</a>
+      </div>
+    </div>
+    <p style="text-align:center; font-size:12px; color:var(--muted); margin-top:20px;">
+      No credit card required to try Pro · Cancel anytime · Payments via Lemon Squeezy
+    </p>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────────────── -->
+<section class="section" id="faq" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Common questions</h2>
+    <div class="faq-list" style="margin-top: 40px;">
+      <div class="faq-item">
+        <div class="faq-q">Does Orenivo read my conversations?</div>
+        <div class="faq-a">No. Orenivo only reads the <strong>titles</strong> of your conversations — never the content. Your messages, prompts, and responses remain entirely private. See our <a href="/privacy">Privacy Policy</a> for the full details.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Where is my data stored?</div>
+        <div class="faq-a">Free tier data lives exclusively on your device in Chrome's local storage — nothing leaves your browser. Pro tier cloud sync data is stored in Supabase on EU-based servers, encrypted at rest and in transit.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Does it work if I'm logged into multiple AI platforms at the same time?</div>
+        <div class="faq-a">Yes. You can be logged into ChatGPT, Claude, Gemini, and DeepSeek simultaneously in different tabs. Orenivo reads from all active tabs and shows everything in one unified panel.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will it break when ChatGPT updates their UI?</div>
+        <div class="faq-a">Orenivo uses multiple selector fallbacks per platform and is updated whenever a major AI platform changes its UI. If something breaks, you'll see a refresh nudge in the panel.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I export my folders and prompts?</div>
+        <div class="faq-a">Yes. Free users can export a JSON backup from Settings. Pro users get one-click export and can import it on any other device.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What's the difference between Free and Pro?</div>
+        <div class="faq-a">Free gives you unlimited conversations, search, and 5 folders. Pro removes all limits and adds cloud sync across devices. Most solo users are happy on the Free tier.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BOTTOM ────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Stop losing your AI conversations.</h2>
+      <p>Install Orenivo in 10 seconds and have every chat organized from day one.</p>
+      <div class="cta-group" style="position: relative;">
+        <a href="#install" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          Add to Chrome — Free
+        </a>
+      </div>
+      <p style="font-size:12px; color:var(--muted); margin-top:14px; position:relative;">
+        Free forever · Chrome Web Store · No account needed
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="/" class="footer-logo">
+        <div class="footer-logo-mark">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+            <rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/>
+            <rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/>
+            <rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/>
+          </svg>
+        </div>
+        <span class="footer-logo-name">Orenivo</span>
+      </a>
+      <div class="footer-links">
+        <a href="/privacy">Privacy</a>
+        <a href="mailto:support@orenivo.ai">Support</a>
+        <a href="https://twitter.com/orenivoapp" target="_blank" rel="noopener">Twitter</a>
+      </div>
+    </div>
+    <div class="footer-right">© 2026 Orenivo · Made in 🇪🇸 Spain</div>
+  </div>
+</footer>
+
+</body>
+</html>

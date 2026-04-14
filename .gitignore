@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.output/
+.wxt/
+*.zip
+.DS_Store
+.env
+.env.local
+reports/prospecting/
+scripts/prospecting/config.json

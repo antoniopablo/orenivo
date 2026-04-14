@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Orenivo — Screenshot 1: Shared Search</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 50% 8%, rgba(16, 185, 129, 0.14) 0%, transparent 28%),
+      linear-gradient(180deg, #05060a 0%, #070910 100%);
+    color: #fff;
+  }
+
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), transparent 96%);
+    pointer-events: none;
+  }
+
+  .title-block {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 28px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.22);
+    color: #34d399;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+  }
+  .title-block h1 {
+    font-size: 50px;
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+  .title-block h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .title-block p {
+    width: 560px;
+    font-size: 16px;
+    line-height: 1.44;
+    color: #6b7280;
+  }
+
+  .browser {
+    position: absolute;
+    border-radius: 26px;
+    overflow: hidden;
+    background: rgba(13, 14, 20, 0.96);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 36px 120px rgba(0,0,0,0.45);
+  }
+  .browser.chatgpt {
+    left: 34px;
+    top: 268px;
+    width: 490px;
+    height: 452px;
+    opacity: 0.94;
+    transform: rotate(-2deg);
+    border-color: rgba(16,163,127,0.18);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.5), 0 0 48px rgba(16,163,127,0.08);
+  }
+  .browser.claude {
+    right: 34px;
+    top: 268px;
+    width: 490px;
+    height: 452px;
+    opacity: 0.94;
+    transform: rotate(2deg);
+    border-color: rgba(217,119,6,0.18);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.5), 0 0 48px rgba(217,119,6,0.08);
+  }
+  .browser-bar {
+    height: 54px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .traffic {
+    display: flex;
+    gap: 8px;
+  }
+  .traffic span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+  }
+  .address {
+    flex: 1;
+    height: 34px;
+    border-radius: 11px;
+    background: rgba(255,255,255,0.05);
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .browser-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .chip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .browser-inner {
+    display: flex;
+    height: calc(100% - 54px);
+  }
+  .sidebar {
+    width: 176px;
+    padding: 16px 14px;
+    border-right: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.015);
+  }
+  .sidebar-title {
+    font-size: 13px;
+    color: #e5e7eb;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .sidebar-item {
+    padding: 10px 12px;
+    border-radius: 11px;
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 6px;
+    background: transparent;
+  }
+  .sidebar-item.active {
+    color: #d1d5db;
+    background: rgba(255,255,255,0.05);
+  }
+  .content {
+    flex: 1;
+    position: relative;
+    padding: 24px 24px 20px;
+  }
+  .content-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 55% 48%, rgba(16,185,129,0.08), transparent 55%);
+    pointer-events: none;
+  }
+  .bubble {
+    position: absolute;
+    border-radius: 18px;
+    padding: 16px 18px;
+    max-width: 280px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #d1d5db;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .bubble.user {
+    top: 76px;
+    right: 24px;
+    background: rgba(255,255,255,0.07);
+  }
+  .bubble.assistant {
+    left: 28px;
+    top: 190px;
+    max-width: 340px;
+    color: #9ca3af;
+  }
+  .composer {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 22px;
+    height: 54px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .extension {
+    position: absolute;
+    left: 50%;
+    top: 278px;
+    transform: translateX(-50%);
+    width: 454px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(13,14,20,0.98) 0%, rgba(9,10,16,0.98) 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      0 50px 140px rgba(0,0,0,0.72),
+      0 0 80px rgba(16,185,129,0.10);
+    z-index: 30;
+  }
+  .ext-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .ext-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ext-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ext-icon svg { width: 15px; height: 15px; }
+  .ext-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .ext-beta {
+    font-size: 10px;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.22);
+    padding: 3px 7px;
+    border-radius: 999px;
+  }
+  .ext-topline {
+    padding: 10px 18px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .platform-pill {
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .search-wrap {
+    padding: 14px 18px 12px;
+  }
+  .search-box {
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(16,185,129,0.28);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px 0 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .search-box span:first-child {
+    color: #f3f4f6;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+  .search-text {
+    flex: 1;
+    color: #f3f4f6;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  .shortcut {
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .result-label {
+    padding: 0 18px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .result:first-of-type {
+    border-top: none;
+  }
+  .result.primary {
+    background: rgba(16,185,129,0.06);
+  }
+  .result-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .result-main {
+    flex: 1;
+    min-width: 0;
+  }
+  .result-title {
+    font-size: 14px;
+    color: #e5e7eb;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .result-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #4b5563;
+  }
+  .folder-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 3px;
+    background: #10b981;
+  }
+  .result-age {
+    font-size: 11px;
+    color: #4b5563;
+    flex-shrink: 0;
+  }
+  .search-footer {
+    padding: 14px 18px 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #6b7280;
+    font-size: 12px;
+  }
+  .search-footer strong {
+    color: #34d399;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-overlay"></div>
+
+<div class="title-block">
+  <div class="badge"><span class="badge-dot"></span> Shared search across tabs</div>
+  <h1>Find chats across<br><em>ChatGPT + Claude.</em></h1>
+  <p>Keep both web apps open and search everything from one Orenivo panel without guessing where the conversation lives.</p>
+</div>
+
+<div class="browser chatgpt">
+  <div class="browser-bar">
+    <div class="traffic">
+      <span style="background:#fb7185"></span>
+      <span style="background:#f59e0b"></span>
+      <span style="background:#22c55e"></span>
+    </div>
+    <div class="browser-chip" style="background:rgba(16,163,127,0.1);border:1px solid rgba(16,163,127,0.22);color:#10a37f">
+      <span class="chip-dot" style="background:#10a37f"></span>
+      ChatGPT
+    </div>
+    <div class="address">chatgpt.com</div>
+  </div>
+  <div class="browser-inner">
+    <div class="sidebar">
+      <div class="sidebar-title">ChatGPT</div>
+      <div class="sidebar-item active">Architecture review</div>
+      <div class="sidebar-item">TypeScript generics deep dive</div>
+      <div class="sidebar-item">Pricing analysis Q2</div>
+      <div class="sidebar-item">Marketing page copy</div>
+      <div class="sidebar-item">React migration notes</div>
+    </div>
+    <div class="content">
+      <div class="content-glow"></div>
+      <div class="bubble user">Explain mapped types with real-world examples.</div>
+      <div class="bubble assistant">Mapped types let you transform every property in a type. They are especially useful when you want a reusable pattern for editing object shapes...</div>
+      <div class="composer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="browser claude">
+  <div class="browser-bar">
+    <div class="traffic">
+      <span style="background:#fb7185"></span>
+      <span style="background:#f59e0b"></span>
+      <span style="background:#22c55e"></span>
+    </div>
+    <div class="browser-chip" style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.22);color:#d97706">
+      <span class="chip-dot" style="background:#d97706"></span>
+      Claude
+    </div>
+    <div class="address">claude.ai</div>
+  </div>
+  <div class="browser-inner">
+    <div class="sidebar">
+      <div class="sidebar-title">Claude</div>
+      <div class="sidebar-item active">Cloud architecture patterns</div>
+      <div class="sidebar-item">AWS microservices review</div>
+      <div class="sidebar-item">Claude prompt experiments</div>
+      <div class="sidebar-item">Founder memo draft</div>
+      <div class="sidebar-item">Launch checklist</div>
+    </div>
+    <div class="content">
+      <div class="content-glow"></div>
+      <div class="bubble user">Compare monolith vs microservices for a 5-person SaaS team.</div>
+      <div class="bubble assistant">For a team this small, optimize for speed of iteration first. A modular monolith usually wins until your deployment and ownership boundaries become painful...</div>
+      <div class="composer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="extension">
+  <div class="ext-header">
+    <div class="ext-logo">
+      <div class="ext-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+          <rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/>
+          <rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/>
+          <rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="ext-name">Orenivo</span>
+    </div>
+    <span class="ext-beta">BETA</span>
+  </div>
+
+  <div class="ext-topline">
+    <span class="platform-pill" style="background:rgba(16,163,127,0.1);border-color:rgba(16,163,127,0.28);color:#10a37f">⬡ ChatGPT</span>
+    <span class="platform-pill" style="background:rgba(217,119,6,0.1);border-color:rgba(217,119,6,0.28);color:#d97706">◈ Claude</span>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span>⌕</span>
+      <div class="search-text">architect</div>
+      <div class="shortcut">⌘K</div>
+    </div>
+  </div>
+
+  <div class="result-label">4 results across ChatGPT + Claude</div>
+
+  <div class="result primary">
+    <div class="result-badge" style="background:#d97706">◈</div>
+    <div class="result-main">
+      <div class="result-title">Architecture review: microservices</div>
+      <div class="result-meta"><span class="folder-dot"></span>Work projects</div>
+    </div>
+    <div class="result-age">2h</div>
+  </div>
+
+  <div class="result">
+    <div class="result-badge" style="background:#10a37f">⬡</div>
+    <div class="result-main">
+      <div class="result-title">TypeScript generics deep dive</div>
+      <div class="result-meta"><span class="folder-dot" style="background:#3b82f6"></span>Frontend</div>
+    </div>
+    <div class="result-age">5h</div>
+  </div>
+
+  <div class="result">
+    <div class="result-badge" style="background:#d97706">◈</div>
+    <div class="result-main">
+      <div class="result-title">Cloud architecture patterns for AWS</div>
+      <div class="result-meta"><span class="folder-dot" style="background:#8b5cf6"></span>Research</div>
+    </div>
+    <div class="result-age">1d</div>
+  </div>
+
+  <div class="result">
+    <div class="result-badge" style="background:#10a37f">⬡</div>
+    <div class="result-main">
+      <div class="result-title">Database schema review</div>
+      <div class="result-meta"><span class="folder-dot" style="background:#f59e0b"></span>Backend</div>
+    </div>
+    <div class="result-age">3d</div>
+  </div>
+
+  <div class="search-footer">
+    <span>Search both sidebars from one place</span>
+    <strong>Desktop web</strong>
+  </div>
+</div>
+
+</body>
+</html>

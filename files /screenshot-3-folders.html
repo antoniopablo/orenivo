@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Orenivo — Screenshot 3: Folders</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 800px; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #06060a; display: flex; align-items: center;
+    justify-content: center; gap: 64px; position: relative;
+  }
+  body::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.07) 0%, transparent 55%);
+    pointer-events:none;
+  }
+
+  .copy { width: 360px; position: relative; z-index: 1; }
+  .tag { display: inline-flex; align-items: center; gap: 7px; padding: 5px 14px; border-radius: 999px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.18); font-size: 12px; color: #34d399; font-weight: 500; margin-bottom: 22px; }
+  .tag-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+  h2 { font-size: 46px; font-weight: 800; color: #fff; letter-spacing: -0.04em; line-height: 1.06; margin-bottom: 18px; }
+  h2 em { font-style: normal; background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .desc { font-size: 16px; color: #4b5563; line-height: 1.7; margin-bottom: 32px; }
+  .feats { display: flex; flex-direction: column; gap: 14px; }
+  .feat { display: flex; align-items: flex-start; gap: 14px; }
+  .fi { width: 34px; height: 34px; border-radius: 9px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .ft { font-size: 13px; color: #6b7280; line-height: 1.55; padding-top: 7px; }
+  .ft strong { color: #e2e8f0; display: block; margin-bottom: 2px; font-size: 14px; }
+
+  .panel { width: 420px; background: #0d0d14; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(16,185,129,0.05); overflow: hidden; position: relative; z-index: 1; }
+  .ph { padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .logo { display: flex; align-items: center; gap: 9px; }
+  .li { width: 26px; height: 26px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .li svg { width: 13px; height: 13px; }
+  .ln { font-size: 15px; font-weight: 700; color: #fff; }
+  .beta { font-size: 9px; padding: 2px 6px; border-radius: 999px; background: rgba(16,185,129,0.15); color: #34d399; font-weight: 600; }
+
+  .tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .tab { flex: 1; padding: 9px 4px; font-size: 11px; font-weight: 500; text-align: center; color: #4b5563; border-bottom: 2px solid transparent; }
+  .tab.on { color: #34d399; border-bottom-color: #10b981; }
+
+  .pb { padding: 10px; }
+  .nfb { display: flex; align-items: center; gap: 8px; padding: 7px 9px; color: #10b981; font-size: 12px; margin-bottom: 4px; }
+  .nfi { width: 20px; height: 20px; border-radius: 6px; border: 1px dashed rgba(16,185,129,0.4); display: flex; align-items: center; justify-content: center; font-size: 11px; }
+
+  .fr { display: flex; align-items: center; gap: 7px; padding: 8px 9px; border-radius: 8px; margin-bottom: 2px; }
+  .fr.open { background: rgba(16,185,129,0.08); outline: 1px solid rgba(16,185,129,0.2); }
+  .fh { font-size: 11px; color: #2d3748; }
+  .fa { font-size: 9px; color: #4b5563; flex-shrink: 0; }
+  .fa.x { transform: rotate(90deg); display: inline-block; }
+  .fd { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .fn { font-size: 13px; color: #f3f4f6; font-weight: 500; flex: 1; }
+  .fc { font-size: 10px; color: #4b5563; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 999px; }
+
+  .kids { padding-left: 18px; }
+  .cr { display: flex; align-items: center; gap: 8px; padding: 6px 9px; border-radius: 7px; }
+  .pd { width: 16px; height: 16px; border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff; }
+  .ct { font-size: 12px; color: #d1d5db; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ct2 { font-size: 10px; color: #374151; flex-shrink: 0; }
+  .sr { display: flex; align-items: center; gap: 7px; padding: 5px 9px; border-radius: 7px; }
+  .sn { font-size: 11px; color: #9ca3af; flex: 1; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="copy">
+  <div class="tag"><span class="tag-dot"></span> Folders &amp; subfolders</div>
+  <h2>Organize every<br>chat into<br><em>folders.</em></h2>
+  <p class="desc">Color-coded folders with unlimited nesting. Drag conversations in, drag folders to reorder. Everything exactly where you put it.</p>
+  <div class="feats">
+    <div class="feat">
+      <div class="fi">🎨</div>
+      <div class="ft"><strong>Color-coded folders</strong>Click the dot to pick from 8 colors — instantly</div>
+    </div>
+    <div class="feat">
+      <div class="fi">↕️</div>
+      <div class="ft"><strong>Drag to reorder</strong>Grab the ⠿ handle and drag folders into your preferred order</div>
+    </div>
+    <div class="feat">
+      <div class="fi">📂</div>
+      <div class="ft"><strong>Nested subfolders</strong>Create folders within folders for deep project organization</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="ph">
+    <div class="logo">
+      <div class="li"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/><rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/><rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/><rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/></svg></div>
+      <span class="ln">Orenivo</span>
+      <span class="beta">BETA</span>
+    </div>
+    <span style="font-size:15px;color:#374151">⚙</span>
+  </div>
+  <div class="tabs">
+    <div class="tab on">📁 Folders</div>
+    <div class="tab">🕐 Recent</div>
+    <div class="tab">📌 Pinned</div>
+    <div class="tab">⚡ Prompts</div>
+  </div>
+  <div class="pb">
+    <div class="nfb"><span class="nfi">+</span> New folder <span style="margin-left:auto;font-size:11px;color:#374151">4/5</span></div>
+
+    <div class="fr open">
+      <span class="fh">⠿</span><span class="fa x">▶</span>
+      <span class="fd" style="background:#10b981"></span>
+      <span class="fn">Work projects</span><span class="fc">6</span>
+    </div>
+    <div class="kids">
+      <div class="cr">
+        <div class="pd" style="background:#10a37f">⬡</div>
+        <span class="ct">TypeScript generics deep dive</span>
+        <span style="font-size:10px">📌</span>
+        <span class="ct2">2h</span>
+      </div>
+      <div class="cr">
+        <div class="pd" style="background:#d97706">◈</div>
+        <span class="ct">Architecture review: microservices</span>
+        <span class="ct2">1d</span>
+      </div>
+      <div class="cr">
+        <div class="pd" style="background:#4285f4">✦</div>
+        <span class="ct">Cloud infra planning Q1</span>
+        <span class="ct2">2d</span>
+      </div>
+      <div class="sr">
+        <span class="fa">▶</span>
+        <span class="fd" style="background:#3b82f6;width:8px;height:8px"></span>
+        <span class="sn">Frontend</span>
+        <span class="fc" style="font-size:9px">3</span>
+      </div>
+    </div>
+
+    <div class="fr">
+      <span class="fh">⠿</span><span class="fa">▶</span>
+      <span class="fd" style="background:#f59e0b"></span>
+      <span class="fn">Marketing</span><span class="fc">4</span>
+    </div>
+    <div class="fr">
+      <span class="fh">⠿</span><span class="fa">▶</span>
+      <span class="fd" style="background:#8b5cf6"></span>
+      <span class="fn">Personal</span><span class="fc">3</span>
+    </div>
+    <div class="fr">
+      <span class="fh">⠿</span><span class="fa">▶</span>
+      <span class="fd" style="background:#ec4899"></span>
+      <span class="fn">Research</span><span class="fc">5</span>
+    </div>
+
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05)">
+      <div style="padding:4px 9px;font-size:10px;color:#374151;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:4px">Unfiled (2)</div>
+      <div class="cr">
+        <div class="pd" style="background:#6366f1">◆</div>
+        <span class="ct">Competitive landscape AI tools</span>
+        <span class="ct2">3d</span>
+      </div>
+      <div class="cr">
+        <div class="pd" style="background:#10a37f">⬡</div>
+        <span class="ct">OAuth2 flow explained</span>
+        <span class="ct2">5d</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

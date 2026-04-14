@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Orenivo</title>
+  <meta name="description" content="Orenivo Privacy Policy — how we handle your data." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d14;
+      --surface: #12121e;
+      --border: rgba(255,255,255,0.06);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #10b981;
+      --accent-dim: rgba(16,185,129,0.15);
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 0 16px;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 64px 0 96px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .logo {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo svg { width: 16px; height: 16px; }
+    .logo-name { font-size: 18px; font-weight: 700; color: #fff; }
+    .back {
+      margin-left: auto;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .back:hover { text-decoration: underline; }
+    h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .updated { font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      margin: 36px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    p { color: var(--muted); margin-bottom: 16px; }
+    ul { color: var(--muted); padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+    strong { color: var(--text); }
+    .highlight {
+      background: var(--accent-dim);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 24px 0;
+    }
+    .highlight p { color: var(--text); margin: 0; font-size: 14px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      color: var(--muted);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    td:first-child { color: var(--text); font-weight: 500; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="white" opacity="0.9"/>
+        <rect x="3" y="13" width="7" height="8" rx="1.5" fill="white" opacity="0.6"/>
+        <rect x="13" y="3" width="8" height="5" rx="1.5" fill="white" opacity="0.7"/>
+        <rect x="13" y="11" width="8" height="4" rx="1.5" fill="white" opacity="0.5"/>
+      </svg>
+    </div>
+    <span class="logo-name">Orenivo</span>
+    <a href="https://orenivo.ai" class="back">← Back to home</a>
+  </header>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: April 2026</p>
+
+  <div class="highlight">
+    <p>
+      <strong>The short version:</strong> Orenivo reads conversation titles and a small amount of related metadata needed to organize your chat list — never the message content.
+      Everything is stored locally on your device. We don't track you, sell data, or use advertising. Ever.
+    </p>
+  </div>
+
+  <h2>1. What Orenivo does</h2>
+  <p>
+    Orenivo is a Chrome extension that organizes your AI conversations from ChatGPT, Claude, Gemini, and DeepSeek
+    into a side panel with folders, search, and prompt templates. It reads minimal conversation metadata from those pages
+    and stores it locally in your browser.
+  </p>
+
+  <h2>2. Data we collect</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>What we do with it</th>
+        <th>Where it's stored</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Conversation metadata</td>
+        <td>Display chats in the side panel for organization and reopening</td>
+        <td>Your device only (chrome.storage.local)</td>
+      </tr>
+      <tr>
+        <td>Folder structure</td>
+        <td>Remember your folder organization</td>
+        <td>Your device only</td>
+      </tr>
+      <tr>
+        <td>Prompt templates</td>
+        <td>Save and reuse prompts you create</td>
+        <td>Your device only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. What we never collect</h2>
+  <ul>
+    <li>The <strong>content</strong> of your AI conversations (messages, responses)</li>
+    <li>Browsing history outside of AI platforms</li>
+    <li>Personal information such as email, name, or payment details</li>
+    <li>Device identifiers or fingerprints</li>
+    <li>Analytics or behavioral tracking data</li>
+  </ul>
+
+  <h2>4. Permissions explained</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Permission</th>
+        <th>Why we need it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>storage</td>
+        <td>Store your folder structure and settings locally in Chrome</td>
+      </tr>
+      <tr>
+        <td>sidePanel</td>
+        <td>Display the Orenivo panel in Chrome's native side panel</td>
+      </tr>
+      <tr>
+        <td>activeTab</td>
+        <td>Read conversation titles and related metadata from the currently active AI tab</td>
+      </tr>
+      <tr>
+        <td>Host permissions<br><small>(chatgpt.com, claude.ai, etc.)</small></td>
+        <td>Access the sidebar DOM of these specific sites to extract conversation titles and related sidebar metadata</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. Third-party services</h2>
+  <p>
+    Orenivo does not currently use third-party analytics, advertising, payment processors, or cloud sync services.
+  </p>
+  <p>
+    Orenivo does <strong>not</strong> use Google Analytics, Mixpanel, Amplitude, or any behavioral analytics service.
+  </p>
+
+  <h2>6. Data storage and security</h2>
+  <p>
+    All data lives exclusively in Chrome's <code>chrome.storage.local</code> API on your device.
+    No data ever leaves your browser.
+  </p>
+  <p>
+    You can export or delete your data at any time from the Settings panel.
+  </p>
+
+  <h2>7. Your rights (GDPR)</h2>
+  <p>If you are located in the European Union, you have the following rights:</p>
+  <ul>
+    <li><strong>Right of access</strong> — request a copy of your data</li>
+    <li><strong>Right to erasure</strong> — request deletion of your data</li>
+    <li><strong>Right to portability</strong> — export your data via the built-in JSON export</li>
+    <li><strong>Right to object</strong> — object to data processing</li>
+    <li><strong>Right to rectification</strong> — correct inaccurate data</li>
+  </ul>
+  <p>To exercise any of these rights, contact us at <a href="mailto:privacy@orenivo.ai">privacy@orenivo.ai</a>.</p>
+
+  <h2>8. Data retention</h2>
+  <p>
+    Data is stored on your device and persists until you uninstall the extension, import over it, or clear Chrome storage.
+  </p>
+
+  <h2>9. Children's privacy</h2>
+  <p>
+    Orenivo is not directed to children under 13. We do not knowingly collect personal information from children.
+    If you believe a child has provided us with personal information, contact us and we will delete it promptly.
+  </p>
+
+  <h2>10. Changes to this policy</h2>
+  <p>
+    We may update this policy as the extension evolves. Material changes will be communicated via
+    the Chrome extension update notes. The date at the top of this page reflects the latest revision.
+  </p>
+
+  <h2>11. Contact</h2>
+  <p>
+    For privacy inquiries:<br>
+    <a href="mailto:privacy@orenivo.ai">privacy@orenivo.ai</a><br>
+    Developer location: Spain, European Union
+  </p>
+
+  <footer>
+    <span>© 2026 Orenivo · Made in 🇪🇸 Spain</span>
+    <span><a href="https://orenivo.ai">orenivo.ai</a></span>
+  </footer>
+</div>
+</body>
+</html>
