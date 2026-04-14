@@ -29,16 +29,13 @@ function PlatformIcon({ platform }: { platform: Platform }) {
 
   switch (platform) {
     case "chatgpt":
-      // OpenAI: hexagon outline + center dot
+      // OpenAI: solid hexagon — no inner structure so it doesn't look like a gear
       return (
         <svg {...svgProps}>
           <path
-            d="M7 1.5 L11.2 3.85 L11.2 10.15 L7 12.5 L2.8 10.15 L2.8 3.85 Z"
-            stroke="white"
-            strokeWidth="1.4"
-            strokeLinejoin="round"
+            d="M7 1.2 L11.4 3.6 L11.4 10.4 L7 12.8 L2.6 10.4 L2.6 3.6 Z"
+            fill="white"
           />
-          <circle cx="7" cy="7" r="1.5" fill="white" />
         </svg>
       );
 
@@ -53,31 +50,30 @@ function PlatformIcon({ platform }: { platform: Platform }) {
       );
 
     case "gemini":
-      // Gemini logo: 4-pointed star with proportional arms (not a "+")
+      // Gemini logo: two crossed bezier lenses forming the real sparkle star
       return (
         <svg {...svgProps}>
           <path
-            d="M7 0.5 L9 4.9 L13.5 7 L9 9.1 L7 13.5 L5 9.1 L0.5 7 L5 4.9 Z"
+            d="M7 0.5 Q9.8 4 9.8 7 Q9.8 10 7 13.5 Q4.2 10 4.2 7 Q4.2 4 7 0.5Z"
+            fill="white"
+          />
+          <path
+            d="M0.5 7 Q4 4.2 7 4.2 Q10 4.2 13.5 7 Q10 9.8 7 9.8 Q4 9.8 0.5 7Z"
             fill="white"
           />
         </svg>
       );
 
     case "deepseek":
-      // DeepSeek: two stacked wave lines (ocean/sea imagery from their brand)
+      // DeepSeek: "D" letter outline
       return (
         <svg {...svgProps}>
           <path
-            d="M1.5 4.8 Q4.5 2.3 7 4.8 Q9.5 7.3 12.5 4.8"
+            d="M3.5 2.5 L3.5 11.5 L7.5 11.5 Q11.5 11.5 11.5 7 Q11.5 2.5 7.5 2.5 Z"
             stroke="white"
-            strokeWidth="1.55"
-            strokeLinecap="round"
-          />
-          <path
-            d="M1.5 9.2 Q4.5 6.7 7 9.2 Q9.5 11.7 12.5 9.2"
-            stroke="white"
-            strokeWidth="1.55"
-            strokeLinecap="round"
+            strokeWidth="1.4"
+            fill="none"
+            strokeLinejoin="round"
           />
         </svg>
       );
