@@ -3,9 +3,9 @@ import { defineConfig } from "wxt";
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
-    name: "Orenivo: Multi-AI Chat Organizer — ChatGPT, Claude, Gemini & Grok",
+    name: "Orenivo — AI Folders for ChatGPT, Claude, Gemini, Grok & DeepSeek",
     description:
-      "Free folders, search & prompts for ChatGPT, Claude, Gemini, Grok and DeepSeek — all in one side panel. No paywall to try it.",
+      "Folders, search & prompt templates for ChatGPT, Claude, Gemini, Grok and DeepSeek — all in one place. Free to use, no paywall.",
     version: "0.1.3",
     permissions: ["storage", "sidePanel", "activeTab"],
     host_permissions: [
