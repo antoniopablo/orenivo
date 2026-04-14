@@ -102,7 +102,9 @@ export function FolderList({ draggingConv }: FolderListProps) {
     .filter((f) => f.parentId === null)
     .sort((a, b) => a.order - b.order);
 
-  const unfiled = filtered.filter((c) => c.folderId === null);
+  const unfiled = filtered
+    .filter((c) => c.folderId === null)
+    .sort((a, b) => b.lastAccessed - a.lastAccessed);
 
   return (
     <div className="space-y-0.5">

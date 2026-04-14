@@ -65,8 +65,8 @@ export class DeepSeekAdapter implements PlatformAdapter {
         ? new URL(href).pathname
         : href;
 
-      // Extract ID from /a/chat/<id> or /chat/<id>
-      const match = path.match(/\/(?:a\/)?chat\/([^/?#]+)/);
+      // Extract ID from /a/chat/s/<id>, /a/chat/<id> or /chat/<id>
+      const match = path.match(/\/(?:a\/)?chat\/(?:s\/)?([^/?#]+)/);
       if (!match) continue;
 
       const id = match[1].trim();
