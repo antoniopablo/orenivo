@@ -2,6 +2,6 @@
   "buildCommand": null,
   "outputDirectory": "deploy-web",
   "rewrites": [
-    { "source": "/privacy", "destination": "/deploy-web/privacy.html" }
+    { "source": "/privacy", "destination": "/privacy.html" }
   ]
 }
