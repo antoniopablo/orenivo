@@ -24,7 +24,8 @@ import { Settings } from "@/components/Settings";
 import { StatusBar } from "@/components/StatusBar";
 import { ConversationItem } from "@/components/ConversationItem";
 import { Onboarding } from "@/components/Onboarding";
-import { isOnboardingDone, setOnboardingDone, getConversations } from "@/lib/storage";
+import { ReviewBanner } from "@/components/ReviewBanner";
+import { isOnboardingDone, setOnboardingDone, getConversations, getInstallDate, isReviewDismissed } from "@/lib/storage";
 import type { Conversation, Folder } from "@/lib/types";
 
 // Global search input ref — used by Cmd+K shortcut
@@ -36,6 +37,7 @@ export default function App() {
   const [draggingFolder, setDraggingFolder] = useState<Folder | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showReviewBanner, setShowReviewBanner] = useState(false);
 
   // 5px activation distance so clicks still work normally
   const sensors = useSensors(
@@ -54,6 +56,16 @@ export default function App() {
           setOnboardingDone();
         } else {
           setShowOnboarding(true);
+        }
+      }
+    });
+
+    // Show review banner after 3 days of use
+    Promise.all([getInstallDate(), isReviewDismissed()]).then(([installDate, dismissed]) => {
+      if (!dismissed) {
+        const daysSinceInstall = (Date.now() - installDate) / (1000 * 60 * 60 * 24);
+        if (daysSinceInstall >= 3) {
+          setShowReviewBanner(true);
         }
       }
     });
@@ -169,6 +181,9 @@ export default function App() {
             <FolderList draggingConv={draggingConv} />
           )}
         </div>
+        {showReviewBanner && (
+          <ReviewBanner onDismiss={() => setShowReviewBanner(false)} />
+        )}
         <StatusBar />
       </div>
 

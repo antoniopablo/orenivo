@@ -13,6 +13,8 @@ const STORAGE_KEYS = {
   settings: "chatorio_settings",
   onboardingDone: "chatorio_onboarding_done",
   language: "chatorio_language",
+  installDate: "orenivo_install_date",
+  reviewDismissed: "orenivo_review_dismissed",
 } as const;
 
 // ── Generic helpers ──
@@ -244,6 +246,25 @@ export async function getLanguage(): Promise<string> {
 
 export async function saveLanguage(lang: string): Promise<void> {
   return set(STORAGE_KEYS.language, lang);
+}
+
+// ── Review prompt ──
+
+export async function getInstallDate(): Promise<number> {
+  const stored = await get<number | null>(STORAGE_KEYS.installDate, null);
+  if (stored) return stored;
+  // First call — record now as install date
+  const now = Date.now();
+  await set(STORAGE_KEYS.installDate, now);
+  return now;
+}
+
+export async function isReviewDismissed(): Promise<boolean> {
+  return get<boolean>(STORAGE_KEYS.reviewDismissed, false);
+}
+
+export async function setReviewDismissed(): Promise<void> {
+  return set(STORAGE_KEYS.reviewDismissed, true);
 }
 
 // ── Utils ──

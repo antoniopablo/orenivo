@@ -11,7 +11,81 @@
   <meta property="og:url" content="https://orenivo.ai" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@orenivoapp" />
+  <meta name="keywords" content="ChatGPT folders, Claude folders, organize AI conversations, AI chat organizer, ChatGPT side panel, Gemini folders, Grok folders, DeepSeek folders, Chrome extension AI" />
   <link rel="icon" href="/favicon.ico" />
+  <!-- Structured data for AI crawlers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Orenivo",
+    "description": "Chrome extension that adds folders, instant search, and prompt templates to ChatGPT, Claude, Gemini, Grok, and DeepSeek — all in one side panel. Free to use, no account required.",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Chrome",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "url": "https://orenivo.com",
+    "featureList": [
+      "Organize AI conversations into folders",
+      "Search across ChatGPT, Claude, Gemini, Grok and DeepSeek at once",
+      "Prompt templates for all platforms",
+      "Works with 5 AI platforms in one Chrome side panel",
+      "Free tier with no account required",
+      "Data stored locally on your device"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Does Orenivo read my conversations?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Orenivo only reads the titles of your conversations — never the content. Your messages, prompts, and responses remain entirely private."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which AI platforms does Orenivo support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Orenivo supports ChatGPT, Claude, Gemini, Grok, and DeepSeek. All five platforms are accessible from a single Chrome side panel."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I organize my AI conversations into folders?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Install the Orenivo Chrome extension, open any AI platform (ChatGPT, Claude, Gemini, Grok, or DeepSeek), and the side panel will appear. Create folders, drag conversations into them, and search across all platforms at once."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where is my data stored?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Free tier data lives exclusively on your device in Chrome's local storage — nothing leaves your browser. Pro tier cloud sync data is stored on EU-based servers, encrypted at rest and in transit."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is there a free plan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The free tier gives you unlimited conversations, search, and folders across all 5 AI platforms. No account required, no time limit."
+        }
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -628,7 +702,7 @@
       <a href="#features" class="hide-mobile">Features</a>
       <a href="#pricing" class="hide-mobile">Pricing</a>
       <a href="#faq" class="hide-mobile">FAQ</a>
-      <a href="#install" class="nav-cta">Add to Chrome — Free</a>
+      <a href="https://chromewebstore.google.com/detail/orenivo/kfchannnfbhplenoakapoaidjmkcdhnk" target="_blank" rel="noopener" class="nav-cta">Add to Chrome — Free</a>
     </div>
   </div>
 </nav>
@@ -639,22 +713,22 @@
   <div class="container">
     <div class="badge">
       <span class="badge-dot"></span>
-      Works with ChatGPT, Claude, Gemini &amp; DeepSeek
+      Works with ChatGPT, Claude, Gemini, Grok &amp; DeepSeek
     </div>
     <h1>One panel for<br><span class="accent">all your AI chats.</span></h1>
     <p class="hero-sub">
-      Stop losing conversations across four different tabs. Orenivo brings folders,
+      Stop losing conversations across five different tabs. Orenivo brings folders,
       instant search, and prompt templates to every AI platform — in one Chrome side panel.
     </p>
     <div class="cta-group">
-      <a href="#install" class="btn-primary" id="install">
+      <a href="https://chromewebstore.google.com/detail/orenivo/kfchannnfbhplenoakapoaidjmkcdhnk" target="_blank" rel="noopener" class="btn-primary">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
         Add to Chrome — Free
       </a>
       <a href="#features" class="btn-ghost">See how it works →</a>
     </div>
     <p class="hero-note">
-      Free forever · No account required · 4 AI platforms
+      Free forever · No account required · 5 AI platforms
     </p>
 
     <div class="platforms">
@@ -676,6 +750,11 @@
       <div class="platform">
         <div class="platform-icon" style="background: rgba(99,102,241,0.15);">🟣</div>
         DeepSeek
+      </div>
+      <div class="sep"></div>
+      <div class="platform">
+        <div class="platform-icon" style="background: rgba(26,26,26,0.5); border: 1px solid rgba(255,255,255,0.1);">⚡</div>
+        Grok
       </div>
     </div>
   </div>
@@ -797,7 +876,7 @@
       </div>
       <div class="feat-card">
         <div class="feat-icon">🌐</div>
-        <h3>All 4 platforms, one panel</h3>
+        <h3>All 5 platforms, one panel</h3>
         <p>ChatGPT, Claude, Gemini, and DeepSeek — organized together. Switch between tools without losing track.</p>
       </div>
       <div class="feat-card">
@@ -845,7 +924,7 @@
   <div class="container">
     <div class="section-label">Comparison</div>
     <h2 class="section-title">Why Orenivo?</h2>
-    <p class="section-desc">The only extension that organizes all four major AI platforms at once.</p>
+    <p class="section-desc">The only extension that organizes all five major AI platforms at once.</p>
     <div class="comp-wrap">
       <table class="comp-table">
         <thead>
@@ -969,7 +1048,7 @@
           <span class="period"> / forever</span>
         </div>
         <ul class="plan-features">
-          <li>All 4 AI platforms</li>
+          <li>All 5 AI platforms</li>
           <li>Up to 5 folders</li>
           <li>Unlimited conversations</li>
           <li>Prompt templates (up to 10)</li>
@@ -979,7 +1058,7 @@
           <li class="muted">No cloud sync</li>
           <li class="muted">No cross-device</li>
         </ul>
-        <a href="#install" class="plan-btn outlined">Get started free</a>
+        <a href="https://chromewebstore.google.com/detail/orenivo/kfchannnfbhplenoakapoaidjmkcdhnk" target="_blank" rel="noopener" class="plan-btn outlined">Get started free</a>
       </div>
       <div class="plan pro">
         <div class="plan-badge">Most popular</div>
@@ -997,7 +1076,7 @@
           <li>Priority support</li>
           <li>Early access to new features</li>
         </ul>
-        <a href="#install" class="plan-btn filled">Start 14-day free trial</a>
+        <a href="https://chromewebstore.google.com/detail/orenivo/kfchannnfbhplenoakapoaidjmkcdhnk" target="_blank" rel="noopener" class="plan-btn filled">Start 14-day free trial</a>
       </div>
     </div>
     <p style="text-align:center; font-size:12px; color:var(--muted); margin-top:20px;">
@@ -1047,7 +1126,7 @@
       <h2>Stop losing your AI conversations.</h2>
       <p>Install Orenivo in 10 seconds and have every chat organized from day one.</p>
       <div class="cta-group" style="position: relative;">
-        <a href="#install" class="btn-primary">
+        <a href="https://chromewebstore.google.com/detail/orenivo/kfchannnfbhplenoakapoaidjmkcdhnk" target="_blank" rel="noopener" class="btn-primary">
           <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
           Add to Chrome — Free
         </a>
