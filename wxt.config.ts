@@ -6,7 +6,7 @@ export default defineConfig({
     name: "Orenivo — AI Folders for ChatGPT, Claude, Gemini, Grok & DeepSeek",
     description:
       "Folders, search & prompt templates for ChatGPT, Claude, Gemini, Grok and DeepSeek — all in one place. Free to use, no paywall.",
-    version: "0.1.3",
+    version: "0.1.4",
     permissions: ["storage", "sidePanel", "activeTab"],
     host_permissions: [
       "https://chat.openai.com/*",
