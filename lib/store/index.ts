@@ -37,6 +37,7 @@ interface OrenivoStore {
   // Actions — Conversations
   updateConversations: (convs: Conversation[]) => Promise<void>;
   moveToFolder: (convId: string, platform: string, folderId: string | null) => Promise<void>;
+  moveManyToFolder: (keys: Array<{ id: string; platform: string }>, folderId: string | null) => Promise<void>;
   togglePinConversation: (convId: string, platform: string) => Promise<void>;
   removeConversation: (convId: string, platform: string) => Promise<void>;
 
@@ -157,6 +158,15 @@ export const useStore = create<OrenivoStore>((set, get) => ({
           : c
       ),
     });
+  },
+
+  moveManyToFolder: async (keys, folderId) => {
+    const keySet = new Set(keys.map((k) => `${k.platform}:${k.id}`));
+    const conversations = get().conversations.map((c) =>
+      keySet.has(`${c.platform}:${c.id}`) ? { ...c, folderId } : c
+    );
+    await storage.saveConversations(conversations);
+    set({ conversations });
   },
 
   togglePinConversation: async (convId, platform) => {

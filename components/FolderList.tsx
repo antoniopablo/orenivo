@@ -33,6 +33,7 @@ export function FolderList({ draggingConv }: FolderListProps) {
     platformFilter,
     activeTab,
     createFolder,
+    moveManyToFolder,
   } = useStore();
 
   const [newFolderName, setNewFolderName] = useState("");
@@ -41,6 +42,30 @@ export function FolderList({ draggingConv }: FolderListProps) {
   // Collapse / expand all
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [commandSeq, setCommandSeq] = useState(0);
+
+  // Bulk selection
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const selectionMode = selectedKeys.size > 0;
+
+  function toggleSelect(conv: { id: string; platform: string }) {
+    const key = `${conv.platform}:${conv.id}`;
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  async function handleBulkMove(folderId: string | null) {
+    const keys = Array.from(selectedKeys).map((k) => {
+      const [platform, ...rest] = k.split(":");
+      return { platform, id: rest.join(":") };
+    });
+    await moveManyToFolder(keys, folderId);
+    setSelectedKeys(new Set());
+    setShowFolderPicker(false);
+  }
 
   const handleToggleAll = () => {
     setAllCollapsed((prev) => !prev);
@@ -72,7 +97,13 @@ export function FolderList({ draggingConv }: FolderListProps) {
           <EmptyState message={t("noSearchResults")} />
         ) : (
           pinned.map((c) => (
-            <ConversationItem key={`${c.platform}:${c.id}`} conversation={c} />
+            <ConversationItem
+              key={`${c.platform}:${c.id}`}
+              conversation={c}
+              selectionMode={selectionMode}
+              selected={selectedKeys.has(`${c.platform}:${c.id}`)}
+              onToggleSelect={toggleSelect}
+            />
           ))
         )}
       </div>
@@ -89,7 +120,13 @@ export function FolderList({ draggingConv }: FolderListProps) {
           <EmptyState message={t("noSearchResults")} />
         ) : (
           recent.map((c) => (
-            <ConversationItem key={`${c.platform}:${c.id}`} conversation={c} />
+            <ConversationItem
+              key={`${c.platform}:${c.id}`}
+              conversation={c}
+              selectionMode={selectionMode}
+              selected={selectedKeys.has(`${c.platform}:${c.id}`)}
+              onToggleSelect={toggleSelect}
+            />
           ))
         )}
       </div>
@@ -197,6 +234,9 @@ export function FolderList({ draggingConv }: FolderListProps) {
             allFolders={folders}
             expandCommand={allCollapsed ? "collapse" : "expand"}
             commandSeq={commandSeq}
+            selectionMode={selectionMode}
+            selectedKeys={selectedKeys}
+            onToggleSelect={toggleSelect}
           />
         ))}
       </SortableContext>
@@ -223,7 +263,13 @@ export function FolderList({ draggingConv }: FolderListProps) {
                 )}
               </div>
               {unfiled.map((c) => (
-                <ConversationItem key={`${c.platform}:${c.id}`} conversation={c} />
+                <ConversationItem
+                  key={`${c.platform}:${c.id}`}
+                  conversation={c}
+                  selectionMode={selectionMode}
+                  selected={selectedKeys.has(`${c.platform}:${c.id}`)}
+                  onToggleSelect={toggleSelect}
+                />
               ))}
             </div>
           )}
@@ -235,6 +281,57 @@ export function FolderList({ draggingConv }: FolderListProps) {
       )}
       {rootFolders.length === 0 && unfiled.length === 0 && conversations.length > 0 && (
         <EmptyState message={t("noSearchResults")} />
+      )}
+
+      {/* Bulk action bar */}
+      {selectionMode && (
+        <div className="fixed bottom-10 left-2 right-2 z-50 bg-surface-light border border-brand-500/30 rounded-xl px-3 py-2.5 shadow-xl shadow-black/50 flex items-center gap-2">
+          <span className="text-[12px] text-gray-300 flex-1">
+            {selectedKeys.size} selected
+          </span>
+          <button
+            onClick={() => setShowFolderPicker((v) => !v)}
+            className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors"
+          >
+            Move to folder
+          </button>
+          <button
+            onClick={() => setSelectedKeys(new Set())}
+            className="text-[11px] text-gray-500 hover:text-gray-300 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            Cancel
+          </button>
+
+          {showFolderPicker && (
+            <div className="absolute bottom-full left-0 right-0 mb-2 bg-[#0d0d14] border border-white/10 rounded-xl shadow-xl overflow-hidden">
+              <div className="px-3 py-2 text-[10px] text-gray-500 uppercase tracking-wider border-b border-white/5">
+                Move to
+              </div>
+              <div className="max-h-48 overflow-y-auto py-1">
+                <button
+                  onClick={() => handleBulkMove(null)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-gray-300 hover:bg-white/5 transition-colors text-left"
+                >
+                  <span className="w-2.5 h-2.5 rounded-sm bg-gray-600 flex-shrink-0" />
+                  Unfiled
+                </button>
+                {folders
+                  .filter((f) => f.parentId === null)
+                  .sort((a, b) => a.order - b.order)
+                  .map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => handleBulkMove(f.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-gray-300 hover:bg-white/5 transition-colors text-left"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: f.color }} />
+                      {f.name}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -249,6 +346,9 @@ function FolderItem({
   level = 0,
   expandCommand,
   commandSeq = 0,
+  selectionMode = false,
+  selectedKeys = new Set(),
+  onToggleSelect,
 }: {
   folder: Folder;
   conversations: Conversation[];
@@ -256,6 +356,9 @@ function FolderItem({
   level?: number;
   expandCommand?: "expand" | "collapse";
   commandSeq?: number;
+  selectionMode?: boolean;
+  selectedKeys?: Set<string>;
+  onToggleSelect?: (conv: Conversation) => void;
 }) {
   const [expanded, setExpanded] = useState(level === 0);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -493,10 +596,19 @@ function FolderItem({
               level={level + 1}
               expandCommand={expandCommand}
               commandSeq={commandSeq}
+              selectionMode={selectionMode}
+              selectedKeys={selectedKeys}
+              onToggleSelect={onToggleSelect}
             />
           ))}
           {folderConvs.map((c) => (
-            <ConversationItem key={`${c.platform}:${c.id}`} conversation={c} />
+            <ConversationItem
+              key={`${c.platform}:${c.id}`}
+              conversation={c}
+              selectionMode={selectionMode}
+              selected={selectedKeys.has(`${c.platform}:${c.id}`)}
+              onToggleSelect={onToggleSelect}
+            />
           ))}
           {folderConvs.length === 0 && childFolders.length === 0 && (
             <div

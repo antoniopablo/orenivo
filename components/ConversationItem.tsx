@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useStore } from "@/lib/store";
@@ -11,12 +11,30 @@ interface ConversationItemProps {
   conversation: Conversation;
   /** When true, renders as the DragOverlay ghost — no drag handlers attached */
   isDragOverlay?: boolean;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (conv: Conversation) => void;
 }
 
-export function ConversationItem({ conversation, isDragOverlay = false }: ConversationItemProps) {
+export function ConversationItem({ conversation, isDragOverlay = false, selectionMode = false, selected = false, onToggleSelect }: ConversationItemProps) {
   const { togglePinConversation } = useStore();
   const { t } = useTranslation();
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handlePointerDown() {
+    if (isDragOverlay || selectionMode) return;
+    longPressTimer.current = setTimeout(() => {
+      onToggleSelect?.(conversation);
+    }, 400);
+  }
+
+  function handlePointerUp() {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  }
 
   const draggableId = `${conversation.platform}:${conversation.id}`;
 
@@ -33,10 +51,34 @@ export function ConversationItem({ conversation, isDragOverlay = false }: Conver
   const timeAgo = getTimeAgo(conversation.lastAccessed, t("timeNow"), t("timeWeeks"));
 
   const handleContextMenu = (e: React.MouseEvent) => {
+    if (selectionMode) return;
     e.preventDefault();
     e.stopPropagation();
     setContextMenu({ x: e.clientX, y: e.clientY });
   };
+
+  if (selectionMode) {
+    return (
+      <div
+        onClick={() => onToggleSelect?.(conversation)}
+        className={[
+          "flex items-center gap-2 px-2 py-1.5 rounded-md transition-all select-none cursor-pointer",
+          selected ? "bg-brand-500/15 ring-1 ring-brand-500/30" : "hover:bg-white/5",
+        ].join(" ")}
+      >
+        <div className={[
+          "w-3.5 h-3.5 rounded flex-shrink-0 border transition-colors flex items-center justify-center",
+          selected ? "bg-brand-500 border-brand-500" : "border-gray-600",
+        ].join(" ")}>
+          {selected && <span className="text-[8px] text-white font-bold">✓</span>}
+        </div>
+        <PlatformBadge platform={conversation.platform} />
+        <span className="text-[13px] text-gray-200 truncate flex-1" title={conversation.title}>
+          {conversation.title}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -45,6 +87,9 @@ export function ConversationItem({ conversation, isDragOverlay = false }: Conver
         style={style}
         {...attributes}
         {...listeners}
+        onPointerDown={(e) => { handlePointerDown(); (listeners as any)?.onPointerDown?.(e); }}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
         onContextMenu={handleContextMenu}
         className={[
           "flex items-center gap-2 px-2 py-1.5 rounded-md group transition-all select-none",
