@@ -43,6 +43,18 @@ export function FolderList({ draggingConv }: FolderListProps) {
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [commandSeq, setCommandSeq] = useState(0);
 
+  // Escape cancels selection
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape" && selectedKeys.size > 0) {
+        setSelectedKeys(new Set());
+        setShowFolderPicker(false);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedKeys]);
+
   // Bulk selection
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [showFolderPicker, setShowFolderPicker] = useState(false);
@@ -55,6 +67,24 @@ export function FolderList({ draggingConv }: FolderListProps) {
       next.has(key) ? next.delete(key) : next.add(key);
       return next;
     });
+  }
+
+  function renderFolderPickerItems(allFolders: Folder[], parentId: string | null, depth: number): React.ReactNode[] {
+    return allFolders
+      .filter((f) => f.parentId === parentId)
+      .sort((a, b) => a.order - b.order)
+      .flatMap((f) => [
+        <button
+          key={f.id}
+          onClick={() => handleBulkMove(f.id)}
+          className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-gray-300 hover:bg-white/5 transition-colors text-left"
+          style={{ paddingLeft: `${12 + depth * 14}px` }}
+        >
+          <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: f.color }} />
+          {f.name}
+        </button>,
+        ...renderFolderPickerItems(allFolders, f.id, depth + 1),
+      ]);
   }
 
   async function handleBulkMove(folderId: string | null) {
@@ -315,19 +345,7 @@ export function FolderList({ draggingConv }: FolderListProps) {
                   <span className="w-2.5 h-2.5 rounded-sm bg-gray-600 flex-shrink-0" />
                   Unfiled
                 </button>
-                {folders
-                  .filter((f) => f.parentId === null)
-                  .sort((a, b) => a.order - b.order)
-                  .map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => handleBulkMove(f.id)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-gray-300 hover:bg-white/5 transition-colors text-left"
-                    >
-                      <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: f.color }} />
-                      {f.name}
-                    </button>
-                  ))}
+                {renderFolderPickerItems(folders, null, 0)}
               </div>
             </div>
           )}
@@ -647,6 +665,7 @@ function NoConversationsState() {
     { icon: "⬡", name: "ChatGPT", url: "https://chatgpt.com", color: "#10a37f" },
     { icon: "◈", name: "Claude", url: "https://claude.ai", color: "#d97706" },
     { icon: "✦", name: "Gemini", url: "https://gemini.google.com", color: "#4285f4" },
+    { icon: "✕", name: "Grok", url: "https://grok.com", color: "#888" },
     { icon: "◆", name: "DeepSeek", url: "https://chat.deepseek.com", color: "#6366f1" },
   ];
 
