@@ -25,11 +25,12 @@ export function ConversationItem({ conversation, isDragOverlay = false, selectio
   function handlePointerDown() {
     if (isDragOverlay || selectionMode) return;
     longPressTimer.current = setTimeout(() => {
+      longPressTimer.current = null;
       onToggleSelect?.(conversation);
-    }, 400);
+    }, 500);
   }
 
-  function handlePointerUp() {
+  function cancelLongPress() {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
@@ -88,8 +89,9 @@ export function ConversationItem({ conversation, isDragOverlay = false, selectio
         {...attributes}
         {...listeners}
         onPointerDown={(e) => { handlePointerDown(); (listeners as any)?.onPointerDown?.(e); }}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
+        onPointerUp={cancelLongPress}
+        onPointerMove={cancelLongPress}
+        onPointerLeave={cancelLongPress}
         onContextMenu={handleContextMenu}
         className={[
           "flex items-center gap-2 px-2 py-1.5 rounded-md group transition-all select-none",

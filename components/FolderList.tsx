@@ -320,6 +320,16 @@ export function FolderList({ draggingConv }: FolderListProps) {
             {selectedKeys.size} selected
           </span>
           <button
+            onClick={() => {
+              const allKeys = new Set(filtered.map((c) => `${c.platform}:${c.id}`));
+              const allSelected = filtered.every((c) => selectedKeys.has(`${c.platform}:${c.id}`));
+              setSelectedKeys(allSelected ? new Set() : allKeys);
+            }}
+            className="text-[11px] text-gray-400 hover:text-gray-200 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          >
+            {filtered.every((c) => selectedKeys.has(`${c.platform}:${c.id}`)) ? "Deselect all" : "Select all"}
+          </button>
+          <button
             onClick={() => setShowFolderPicker((v) => !v)}
             className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors"
           >
@@ -329,7 +339,7 @@ export function FolderList({ draggingConv }: FolderListProps) {
             onClick={() => setSelectedKeys(new Set())}
             className="text-[11px] text-gray-500 hover:text-gray-300 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
           >
-            Cancel
+            ✕
           </button>
 
           {showFolderPicker && (
