@@ -9,6 +9,9 @@ interface SettingsProps {
   onClose: () => void;
 }
 
+const VERSION = chrome.runtime.getManifest().version;
+const CWS_REVIEW_URL = `https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`;
+
 export function Settings({ onClose }: SettingsProps) {
   const { plan, folders, conversations, prompts, language, setLanguage } = useStore();
   const { t } = useTranslation();
@@ -79,7 +82,7 @@ export function Settings({ onClose }: SettingsProps) {
           </button>
           <span className="text-sm font-semibold text-white">{t("settingsTitle")}</span>
         </div>
-        <span className="text-[10px] text-gray-600">v0.1.0</span>
+        <span className="text-[10px] text-gray-600">v{VERSION}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
@@ -108,12 +111,18 @@ export function Settings({ onClose }: SettingsProps) {
             )}
           </div>
           {plan === "free" && (
-            <p className="text-[10px] text-gray-600 px-1 leading-relaxed">
-              {t("planUpgradeHint")}{" "}
-              <span className="text-brand-400 cursor-pointer hover:underline">
-                {t("planMoreInfo")}
-              </span>
-            </p>
+            <a
+              href="https://orenivo.com/#pricing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-brand-500/10 to-brand-600/5 rounded-xl border border-brand-500/20 hover:border-brand-500/40 transition-colors"
+            >
+              <div>
+                <p className="text-[12px] text-brand-300 font-medium">Upgrade to Pro</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Unlimited folders · Cloud sync</p>
+              </div>
+              <span className="text-brand-400 text-[11px]">→</span>
+            </a>
           )}
         </Section>
 
@@ -197,7 +206,7 @@ export function Settings({ onClose }: SettingsProps) {
           <div className="px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[12px] text-gray-400">{t("aboutVersion")}</span>
-              <span className="text-[12px] text-white">0.1.0 Beta</span>
+              <span className="text-[12px] text-white">v{VERSION}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[12px] text-gray-400">{t("aboutSupport")}</span>
@@ -208,6 +217,19 @@ export function Settings({ onClose }: SettingsProps) {
               <span className="text-[12px] text-gray-300">{t("aboutMadeInValue")}</span>
             </div>
           </div>
+          <a
+            href={CWS_REVIEW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:bg-white/5 transition-colors"
+          >
+            <span className="text-lg">⭐</span>
+            <div className="flex-1">
+              <p className="text-[13px] text-white font-medium">Leave a review</p>
+              <p className="text-[11px] text-gray-500">Helps other users find Orenivo</p>
+            </div>
+            <span className="text-gray-600 text-[11px]">→</span>
+          </a>
         </Section>
       </div>
     </div>
