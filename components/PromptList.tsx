@@ -68,9 +68,9 @@ export function PromptList() {
         {!atLimit && !showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="text-[11px] text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-brand-500/15 hover:bg-brand-500/25 text-brand-400 hover:text-brand-300 text-[11px] font-medium transition-colors border border-brand-500/20"
           >
-            <span className="text-[14px] leading-none">+</span> {t("newPrompt")}
+            <span className="text-[13px] leading-none">+</span> {t("newPrompt")}
           </button>
         )}
       </div>
