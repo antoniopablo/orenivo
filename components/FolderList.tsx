@@ -675,8 +675,8 @@ function NoConversationsState() {
     { icon: "⬡", name: "ChatGPT", url: "https://chatgpt.com", color: "#10a37f" },
     { icon: "◈", name: "Claude", url: "https://claude.ai", color: "#d97706" },
     { icon: "✦", name: "Gemini", url: "https://gemini.google.com", color: "#4285f4" },
-    { icon: "✕", name: "Grok", url: "https://grok.com", color: "#888" },
     { icon: "◆", name: "DeepSeek", url: "https://chat.deepseek.com", color: "#6366f1" },
+    { icon: "𝕏", name: "Grok", url: "https://grok.com", color: "#e7e7e7" },
   ];
 
   return (

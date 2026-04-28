@@ -18,9 +18,6 @@ export function Header({ onSettings }: HeaderProps) {
           </svg>
         </div>
         <span className="text-sm font-semibold text-white">Orenivo</span>
-        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-brand-500/15 text-brand-400 font-medium">
-          BETA
-        </span>
       </div>
       <button
         onClick={onSettings}
