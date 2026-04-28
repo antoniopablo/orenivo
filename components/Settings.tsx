@@ -4,6 +4,7 @@ import { getFullState, importState } from "@/lib/storage";
 import { FREE_LIMITS } from "@/lib/plans";
 import { useTranslation, LOCALE_NAMES } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
+import { AuthModal } from "./AuthModal";
 
 interface SettingsProps {
   onClose: () => void;
@@ -11,12 +12,15 @@ interface SettingsProps {
 
 const VERSION = chrome.runtime.getManifest().version;
 const CWS_REVIEW_URL = `https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`;
+const LEMON_CHECKOUT_URL = import.meta.env.VITE_LEMON_SQUEEZY_CHECKOUT_URL as string | undefined;
 
 export function Settings({ onClose }: SettingsProps) {
-  const { plan, folders, conversations, prompts, language, setLanguage } = useStore();
+  const { plan, folders, conversations, prompts, language, setLanguage, user, signOut, syncToCloud, isSyncing, lastSyncedAt, loadUser } = useStore();
   const { t } = useTranslation();
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "done">("idle");
 
   async function handleExport() {
     const state = await getFullState();
@@ -48,7 +52,7 @@ export function Settings({ onClose }: SettingsProps) {
           !Array.isArray(parsed.conversations) ||
           !Array.isArray(parsed.prompts ?? [])
         ) {
-          setImportError("Archivo inválido. Asegúrate de usar un backup de Orenivo.");
+          setImportError(t("importError"));
           return;
         }
         await importState({
@@ -57,15 +61,26 @@ export function Settings({ onClose }: SettingsProps) {
           prompts: Array.isArray(parsed.prompts) ? parsed.prompts : [],
         });
         setImportSuccess(true);
-        // Reload store state
         setTimeout(() => window.location.reload(), 800);
       } catch {
-        setImportError("No se pudo leer el archivo. Comprueba que es un JSON válido.");
+        setImportError(t("importJsonError"));
       }
     };
     reader.readAsText(file);
-    // Reset input so same file can be re-imported
     e.target.value = "";
+  }
+
+  async function handleSyncNow() {
+    await syncToCloud();
+    setSyncStatus("done");
+    setTimeout(() => setSyncStatus("idle"), 2500);
+  }
+
+  function getCheckoutUrl() {
+    if (!LEMON_CHECKOUT_URL) return "https://orenivo.com/#pricing";
+    const url = new URL(LEMON_CHECKOUT_URL);
+    if (user?.email) url.searchParams.set("checkout[email]", user.email);
+    return url.toString();
   }
 
   return (
@@ -86,6 +101,62 @@ export function Settings({ onClose }: SettingsProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+
+        {/* Account */}
+        <Section title={t("accountSection")}>
+          {user ? (
+            <div className="space-y-2">
+              <div className="px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-gray-400">{t("signedInAs")}</span>
+                  <span className="text-[11px] text-white truncate max-w-[140px]">{user.email}</span>
+                </div>
+                {plan === "pro" && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-gray-400">{t("cloudSyncActive")}</span>
+                    <span className="text-[10px] text-brand-400">✓</span>
+                  </div>
+                )}
+              </div>
+
+              {plan === "pro" && (
+                <button
+                  onClick={handleSyncNow}
+                  disabled={isSyncing}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:bg-white/5 disabled:opacity-50 transition-colors text-left"
+                >
+                  <span className="text-lg">{isSyncing ? "⏳" : syncStatus === "done" ? "✅" : "☁️"}</span>
+                  <p className="text-[13px] text-white font-medium">
+                    {isSyncing ? t("syncing") : syncStatus === "done" ? t("syncDone") : t("syncNow")}
+                  </p>
+                </button>
+              )}
+
+              <button
+                onClick={() => signOut()}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-left"
+              >
+                <span className="text-lg">🚪</span>
+                <p className="text-[13px] text-gray-400">{t("signOut")}</p>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="px-3 py-2.5 bg-surface-light rounded-xl border border-white/5">
+                <p className="text-[12px] text-gray-400">{t("notSignedIn")}</p>
+                <p className="text-[10px] text-gray-600 mt-0.5">{t("signInDesc")}</p>
+              </div>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-left"
+              >
+                <span className="text-lg">🔑</span>
+                <p className="text-[13px] text-white font-medium">{t("signIn")}</p>
+              </button>
+            </div>
+          )}
+        </Section>
+
         {/* Plan */}
         <Section title={t("planSection")}>
           <div className="flex items-center justify-between px-3 py-2.5 bg-surface-light rounded-xl border border-white/5">
@@ -112,7 +183,7 @@ export function Settings({ onClose }: SettingsProps) {
           </div>
           {plan === "free" && (
             <a
-              href="https://orenivo.com/#pricing"
+              href={getCheckoutUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-brand-500/10 to-brand-600/5 rounded-xl border border-brand-500/20 hover:border-brand-500/40 transition-colors"
@@ -210,7 +281,7 @@ export function Settings({ onClose }: SettingsProps) {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[12px] text-gray-400">{t("aboutSupport")}</span>
-              <span className="text-[12px] text-brand-400">support@orenivo.ai</span>
+              <span className="text-[12px] text-brand-400">support@orenivo.com</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[12px] text-gray-400">{t("aboutMadeIn")}</span>
@@ -232,6 +303,16 @@ export function Settings({ onClose }: SettingsProps) {
           </a>
         </Section>
       </div>
+
+      {showAuthModal && (
+        <AuthModal
+          onSuccess={() => {
+            setShowAuthModal(false);
+            loadUser();
+          }}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
     </div>
   );
 }

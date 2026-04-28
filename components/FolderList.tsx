@@ -43,6 +43,11 @@ export function FolderList({ draggingConv }: FolderListProps) {
   const [allCollapsed, setAllCollapsed] = useState(false);
   const [commandSeq, setCommandSeq] = useState(0);
 
+  // Bulk selection
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const selectionMode = selectedKeys.size > 0;
+
   // Escape cancels selection
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -54,11 +59,6 @@ export function FolderList({ draggingConv }: FolderListProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [selectedKeys]);
-
-  // Bulk selection
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [showFolderPicker, setShowFolderPicker] = useState(false);
-  const selectionMode = selectedKeys.size > 0;
 
   function toggleSelect(conv: { id: string; platform: string }) {
     const key = `${conv.platform}:${conv.id}`;

@@ -5,11 +5,13 @@
 
 import { create } from "zustand";
 import { arrayMove } from "@dnd-kit/sortable";
+import type { User } from "@supabase/supabase-js";
 import type { Folder, Conversation, PromptTemplate, Platform } from "../types";
 import { FOLDER_COLORS } from "../types";
 import * as storage from "../storage";
 import { type Plan, canCreateFolder, canCreatePrompt } from "../plans";
 import type { Locale } from "../i18n";
+import { getUser, getUserPlan, signOut as supabaseSignOut, syncFolders, syncConversations, syncPrompts, fetchCloudData } from "../supabase";
 
 interface OrenivoStore {
   // State
@@ -22,9 +24,17 @@ interface OrenivoStore {
   platformFilter: Platform | "all";
   activeTab: "folders" | "recent" | "pinned" | "prompts";
   isLoading: boolean;
+  user: User | null;
+  isSyncing: boolean;
+  lastSyncedAt: number | null;
 
   // Actions — Data loading
   loadAll: () => Promise<void>;
+
+  // Actions — Auth & Cloud Sync
+  loadUser: () => Promise<void>;
+  signOut: () => Promise<void>;
+  syncToCloud: () => Promise<void>;
 
   // Actions — Folders
   // Returns false if the free tier folder limit has been reached
@@ -63,6 +73,9 @@ export const useStore = create<OrenivoStore>((set, get) => ({
   platformFilter: "all",
   activeTab: "folders",
   isLoading: true,
+  user: null,
+  isSyncing: false,
+  lastSyncedAt: null,
 
   // ── Data loading ──
 
@@ -75,6 +88,60 @@ export const useStore = create<OrenivoStore>((set, get) => ({
       storage.getLanguage(),
     ]);
     set({ folders, conversations, prompts, language: language as Locale, isLoading: false });
+
+    // Load user & plan in background (non-blocking)
+    get().loadUser();
+  },
+
+  // ── Auth & Cloud Sync ──
+
+  loadUser: async () => {
+    const user = await getUser();
+    if (!user) {
+      set({ user: null, plan: "free" });
+      return;
+    }
+    const plan = await getUserPlan();
+    set({ user, plan });
+
+    // If Pro, fetch cloud data and merge
+    if (plan === "pro") {
+      const cloudData = await fetchCloudData();
+      if (cloudData) {
+        // Cloud wins: replace local data with cloud data
+        await Promise.all([
+          storage.saveFolders(cloudData.folders),
+          storage.saveConversations(cloudData.conversations),
+          storage.savePrompts(cloudData.prompts),
+        ]);
+        set({
+          folders: cloudData.folders,
+          conversations: cloudData.conversations,
+          prompts: cloudData.prompts,
+        });
+      }
+    }
+  },
+
+  signOut: async () => {
+    await supabaseSignOut();
+    set({ user: null, plan: "free" });
+  },
+
+  syncToCloud: async () => {
+    const { user, plan, folders, conversations, prompts } = get();
+    if (!user || plan !== "pro") return;
+    set({ isSyncing: true });
+    try {
+      await Promise.all([
+        syncFolders(folders),
+        syncConversations(conversations),
+        syncPrompts(prompts),
+      ]);
+      set({ lastSyncedAt: Date.now() });
+    } finally {
+      set({ isSyncing: false });
+    }
   },
 
   // ── Folders ──
