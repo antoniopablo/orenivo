@@ -109,6 +109,7 @@ export async function getUserPlan(): Promise<DbPlan> {
 // ── Cloud Sync (Pro only) ──
 
 export async function syncFolders(folders: Folder[]): Promise<void> {
+  if (folders.length === 0) return;
   const user = await getUser();
   if (!user) return;
 
@@ -123,12 +124,15 @@ export async function syncFolders(folders: Folder[]): Promise<void> {
     updated_at: Date.now(),
   }));
 
-  await supabase
+  const { error } = await supabase
     .from("folders")
     .upsert(rows, { onConflict: "id" });
+
+  if (error) console.error("[Orenivo] syncFolders error:", error.message);
 }
 
 export async function syncConversations(conversations: Conversation[]): Promise<void> {
+  if (conversations.length === 0) return;
   const user = await getUser();
   if (!user) return;
 
@@ -144,12 +148,15 @@ export async function syncConversations(conversations: Conversation[]): Promise<
     updated_at: Date.now(),
   }));
 
-  await supabase
+  const { error } = await supabase
     .from("conversations")
     .upsert(rows, { onConflict: "id,platform" });
+
+  if (error) console.error("[Orenivo] syncConversations error:", error.message);
 }
 
 export async function syncPrompts(prompts: PromptTemplate[]): Promise<void> {
+  if (prompts.length === 0) return;
   const user = await getUser();
   if (!user) return;
 
@@ -164,9 +171,11 @@ export async function syncPrompts(prompts: PromptTemplate[]): Promise<void> {
     updated_at: Date.now(),
   }));
 
-  await supabase
+  const { error } = await supabase
     .from("prompts")
     .upsert(rows, { onConflict: "id" });
+
+  if (error) console.error("[Orenivo] syncPrompts error:", error.message);
 }
 
 export async function fetchCloudData(): Promise<{
