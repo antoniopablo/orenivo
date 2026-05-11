@@ -29,6 +29,8 @@ import { ProWelcome } from "@/components/ProWelcome";
 import { isOnboardingDone, setOnboardingDone, getConversations, getInstallDate, isReviewDismissed } from "@/lib/storage";
 import type { Conversation, Folder } from "@/lib/types";
 
+const LEMON_CHECKOUT_URL = import.meta.env.VITE_LEMON_SQUEEZY_CHECKOUT_URL as string | undefined;
+
 // Global search input ref — used by Cmd+K shortcut
 export const searchInputRef = { current: null as HTMLInputElement | null };
 
@@ -199,6 +201,21 @@ export default function App() {
         </div>
         {showReviewBanner && (
           <ReviewBanner onDismiss={() => setShowReviewBanner(false)} />
+        )}
+        {plan === "free" && (
+          <a
+            href={LEMON_CHECKOUT_URL || "https://orenivo.com/#pricing"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-2 mb-1.5 flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-brand-500/8 to-brand-600/5 border border-brand-500/15 hover:border-brand-500/30 transition-colors"
+          >
+            <span className="text-[13px]">✦</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-brand-300 font-medium">Upgrade to Pro</p>
+              <p className="text-[9px] text-gray-500">Unlimited folders · Cloud sync · $4.99/mo</p>
+            </div>
+            <span className="text-brand-400/60 text-[10px]">→</span>
+          </a>
         )}
         <StatusBar />
       </div>
