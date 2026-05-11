@@ -151,7 +151,10 @@ export function Settings({ onClose }: SettingsProps) {
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 hover:bg-white/5 transition-colors text-left"
               >
                 <span className="text-lg">🔑</span>
-                <p className="text-[13px] text-white font-medium">{t("signIn")}</p>
+                <div>
+                  <p className="text-[13px] text-white font-medium">Sign in / Create account</p>
+                  <p className="text-[10px] text-gray-600 mt-0.5">Enter your email — we'll send a code</p>
+                </div>
               </button>
             </div>
           )}
