@@ -12,8 +12,9 @@ interface ReviewBannerProps {
 
 export function ReviewBanner({ onDismiss }: ReviewBannerProps) {
   function handleRate() {
-    const id = chrome.runtime.id;
-    const url = `https://chromewebstore.google.com/detail/${id}/reviews`;
+    // Always use the published extension ID so the link works correctly
+    const CWS_ID = "kfchannnfbhplenoakapoaidjmkcdhnk";
+    const url = `https://chromewebstore.google.com/detail/${CWS_ID}/reviews`;
     window.open(url, "_blank");
     setReviewDismissed();
     onDismiss();
