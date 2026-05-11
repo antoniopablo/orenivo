@@ -23,8 +23,10 @@ const CONVERSATION_ITEM_SELECTORS = [
   "nav[aria-label='Chat history'] a[href^='/c/']",
   "nav a[href^='/c/']",
   "a[href^='/c/']",
-  // Projects sidebar items also use /c/ but inside a different nav
+  "a[href*='/c/']",
   "[data-testid='history-item'] a",
+  "li a[href*='/c/']",
+  "ol a[href*='/c/']",
 ];
 
 export class ChatGPTAdapter implements PlatformAdapter {
@@ -37,6 +39,17 @@ export class ChatGPTAdapter implements PlatformAdapter {
 
   getConversations(): Conversation[] {
     const links = queryAllWithFallback(CONVERSATION_ITEM_SELECTORS);
+
+    // Debug: log what we found to help diagnose selector issues
+    if (links.length === 0) {
+      const allLinks = document.querySelectorAll("a[href]");
+      const cLinks = Array.from(allLinks).filter((a) => a.getAttribute("href")?.includes("/c/"));
+      console.log(`[Orenivo/ChatGPT] Debug: ${allLinks.length} total links, ${cLinks.length} contain /c/`);
+      if (cLinks.length > 0) {
+        console.log("[Orenivo/ChatGPT] Sample href:", cLinks[0].getAttribute("href"));
+      }
+    }
+
     const conversations: Conversation[] = [];
     const seen = new Set<string>();
 

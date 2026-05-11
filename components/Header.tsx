@@ -28,11 +28,13 @@ export function Header({ onSettings }: HeaderProps) {
       </div>
       <button
         onClick={onSettings}
-        className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white/8 text-gray-400 hover:text-gray-200 text-[11px] transition-colors border border-white/8"
+        className="relative w-7 h-7 rounded-lg hover:bg-white/8 text-gray-400 hover:text-gray-200 flex items-center justify-center transition-colors"
         title={t("settings")}
       >
-        <span className="text-[12px]">⚙</span>
-        <span>{t("settings")}</span>
+        <span className="text-[14px]">⚙</span>
+        {plan === "free" && (
+          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-brand-500 border border-surface" />
+        )}
       </button>
     </div>
   );
