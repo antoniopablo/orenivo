@@ -25,6 +25,7 @@ import { StatusBar } from "@/components/StatusBar";
 import { ConversationItem } from "@/components/ConversationItem";
 import { Onboarding } from "@/components/Onboarding";
 import { ReviewBanner } from "@/components/ReviewBanner";
+import { ProWelcome } from "@/components/ProWelcome";
 import { isOnboardingDone, setOnboardingDone, getConversations, getInstallDate, isReviewDismissed } from "@/lib/storage";
 import type { Conversation, Folder } from "@/lib/types";
 
@@ -32,7 +33,7 @@ import type { Conversation, Folder } from "@/lib/types";
 export const searchInputRef = { current: null as HTMLInputElement | null };
 
 export default function App() {
-  const { loadAll, updateConversations, conversations, moveToFolder, reorderFolders, isLoading, activeTab } = useStore();
+  const { loadAll, updateConversations, conversations, moveToFolder, reorderFolders, isLoading, activeTab, justUpgraded, refreshPlan, syncToCloud, plan } = useStore();
   const [draggingConv, setDraggingConv] = useState<Conversation | null>(null);
   const [draggingFolder, setDraggingFolder] = useState<Folder | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -78,6 +79,21 @@ export default function App() {
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
+  }, []);
+
+  // Auto-refresh plan when panel gains focus (detects upgrade after checkout)
+  // Auto-sync to cloud when panel loses focus (save on close)
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === "visible") {
+        refreshPlan();
+      } else {
+        const { plan: currentPlan } = useStore.getState();
+        if (currentPlan === "pro") syncToCloud();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   // Cmd+K / Ctrl+K → focus search
@@ -186,6 +202,8 @@ export default function App() {
         )}
         <StatusBar />
       </div>
+
+      {justUpgraded && <ProWelcome />}
 
       {/* Overlay renders at the root level — never clipped by overflow */}
       <DragOverlay>

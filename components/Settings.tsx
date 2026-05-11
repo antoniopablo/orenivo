@@ -185,18 +185,36 @@ export function Settings({ onClose }: SettingsProps) {
             )}
           </div>
           {plan === "free" && (
-            <a
-              href={getCheckoutUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-brand-500/10 to-brand-600/5 rounded-xl border border-brand-500/20 hover:border-brand-500/40 transition-colors"
-            >
-              <div>
-                <p className="text-[12px] text-brand-300 font-medium">Upgrade to Pro</p>
-                <p className="text-[10px] text-gray-500 mt-0.5">Unlimited folders · Cloud sync</p>
+            <>
+              <div className="px-3 py-2.5 bg-surface-light rounded-xl border border-white/5 space-y-1.5">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Free vs Pro</p>
+                {[
+                  { feature: "Folders", free: "5", pro: "Unlimited" },
+                  { feature: "Prompts", free: "5", pro: "Unlimited" },
+                  { feature: "Cloud sync", free: "✗", pro: "✓" },
+                  { feature: "Export / Import", free: "✓", pro: "✓" },
+                  { feature: "Priority support", free: "✗", pro: "✓" },
+                ].map((row) => (
+                  <div key={row.feature} className="flex items-center text-[11px]">
+                    <span className="flex-1 text-gray-400">{row.feature}</span>
+                    <span className="w-12 text-center text-gray-600">{row.free}</span>
+                    <span className="w-12 text-center text-brand-400 font-medium">{row.pro}</span>
+                  </div>
+                ))}
               </div>
-              <span className="text-brand-400 text-[11px]">→</span>
-            </a>
+              <a
+                href={getCheckoutUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-gradient-to-r from-brand-500/10 to-brand-600/5 rounded-xl border border-brand-500/20 hover:border-brand-500/40 transition-colors"
+              >
+                <div>
+                  <p className="text-[12px] text-brand-300 font-medium">Upgrade to Pro — $4.99/mo</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">Unlimited folders · Cloud sync across devices</p>
+                </div>
+                <span className="text-brand-400 text-[11px]">→</span>
+              </a>
+            </>
           )}
         </Section>
 

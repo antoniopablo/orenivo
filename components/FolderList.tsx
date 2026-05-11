@@ -233,7 +233,7 @@ export function FolderList({ draggingConv }: FolderListProps) {
               +
             </span>
             {t("newFolder")}
-            {remainingFolders !== null && (
+            {plan === "free" && remainingFolders !== null && (
               <span className="ml-auto text-[10px] text-gray-600">
                 {folders.length}/{FREE_LIMITS.folders}
               </span>

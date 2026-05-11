@@ -13,6 +13,10 @@ import { type Plan, canCreateFolder, canCreatePrompt } from "../plans";
 import type { Locale } from "../i18n";
 import { getUser, getUserPlan, signOut as supabaseSignOut, syncFolders, syncConversations, syncPrompts, fetchCloudData } from "../supabase";
 
+// Track sync interval so we can clear it on sign out
+let syncIntervalId: ReturnType<typeof setInterval> | null = null;
+const SYNC_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
 interface OrenivoStore {
   // State
   plan: Plan;
@@ -27,14 +31,17 @@ interface OrenivoStore {
   user: User | null;
   isSyncing: boolean;
   lastSyncedAt: number | null;
+  justUpgraded: boolean;
 
   // Actions — Data loading
   loadAll: () => Promise<void>;
 
   // Actions — Auth & Cloud Sync
   loadUser: () => Promise<void>;
+  refreshPlan: () => Promise<void>;
   signOut: () => Promise<void>;
   syncToCloud: () => Promise<void>;
+  dismissUpgrade: () => void;
 
   // Actions — Folders
   // Returns false if the free tier folder limit has been reached
@@ -76,6 +83,7 @@ export const useStore = create<OrenivoStore>((set, get) => ({
   user: null,
   isSyncing: false,
   lastSyncedAt: null,
+  justUpgraded: false,
 
   // ── Data loading ──
 
@@ -104,11 +112,10 @@ export const useStore = create<OrenivoStore>((set, get) => ({
     const plan = await getUserPlan();
     set({ user, plan });
 
-    // If Pro, fetch cloud data and merge
+    // If Pro, fetch cloud data and merge + start auto-sync
     if (plan === "pro") {
       const cloudData = await fetchCloudData();
       if (cloudData) {
-        // Cloud wins: replace local data with cloud data
         await Promise.all([
           storage.saveFolders(cloudData.folders),
           storage.saveConversations(cloudData.conversations),
@@ -120,12 +127,48 @@ export const useStore = create<OrenivoStore>((set, get) => ({
           prompts: cloudData.prompts,
         });
       }
+
+      // Start auto-sync interval
+      if (!syncIntervalId) {
+        syncIntervalId = setInterval(() => {
+          get().syncToCloud();
+        }, SYNC_INTERVAL_MS);
+      }
     }
   },
 
+  refreshPlan: async () => {
+    const user = await getUser();
+    if (!user) return;
+    const previousPlan = get().plan;
+    const plan = await getUserPlan();
+    set({ user, plan });
+
+    // Detect free→pro transition
+    if (previousPlan === "free" && plan === "pro") {
+      set({ justUpgraded: true });
+
+      // Start auto-sync on upgrade
+      if (!syncIntervalId) {
+        syncIntervalId = setInterval(() => {
+          get().syncToCloud();
+        }, SYNC_INTERVAL_MS);
+      }
+
+      // Initial sync after upgrade
+      get().syncToCloud();
+    }
+  },
+
+  dismissUpgrade: () => set({ justUpgraded: false }),
+
   signOut: async () => {
     await supabaseSignOut();
-    set({ user: null, plan: "free" });
+    if (syncIntervalId) {
+      clearInterval(syncIntervalId);
+      syncIntervalId = null;
+    }
+    set({ user: null, plan: "free", lastSyncedAt: null });
   },
 
   syncToCloud: async () => {

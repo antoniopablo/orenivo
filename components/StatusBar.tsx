@@ -4,7 +4,7 @@ import { PLATFORMS, type Platform } from "@/lib/types";
 import { useTranslation } from "@/lib/i18n";
 
 export function StatusBar() {
-  const { conversations, folders } = useStore();
+  const { conversations, folders, plan, isSyncing, lastSyncedAt } = useStore();
   const [activePlatforms, setActivePlatforms] = useState<Platform[]>([]);
 
   useEffect(() => {
@@ -59,8 +59,16 @@ export function StatusBar() {
           )}
         </div>
 
-        {/* Stats */}
-        <div className="flex gap-2 text-[10px] text-gray-600 flex-shrink-0">
+        {/* Stats + Cloud sync indicator */}
+        <div className="flex items-center gap-2 text-[10px] text-gray-600 flex-shrink-0">
+          {plan === "pro" && (
+            <>
+              <span className="text-brand-400/70" title={lastSyncedAt ? `Last sync: ${new Date(lastSyncedAt).toLocaleTimeString()}` : "Not synced yet"}>
+                {isSyncing ? "⏳" : "☁️"}
+              </span>
+              <span>·</span>
+            </>
+          )}
           <span>{conversations.length} {t("statChats")}</span>
           <span>·</span>
           <span>{folders.length} {t("statFolders")}</span>

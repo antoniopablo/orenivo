@@ -1,3 +1,4 @@
+import { useStore } from "@/lib/store";
 import { useTranslation } from "@/lib/i18n";
 
 interface HeaderProps {
@@ -5,6 +6,7 @@ interface HeaderProps {
 }
 
 export function Header({ onSettings }: HeaderProps) {
+  const { plan } = useStore();
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between px-3 pt-3 pb-2">
@@ -18,6 +20,11 @@ export function Header({ onSettings }: HeaderProps) {
           </svg>
         </div>
         <span className="text-sm font-semibold text-white">Orenivo</span>
+        {plan === "pro" && (
+          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-brand-500/15 text-brand-400 font-semibold tracking-wide">
+            PRO
+          </span>
+        )}
       </div>
       <button
         onClick={onSettings}
